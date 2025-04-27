@@ -115,63 +115,63 @@ bookRouter.post(
         }
     },
     async (request: Request, response: Response) => {
-        // Insert the book into the database
-        const theQuery = `
-            INSERT INTO Book(
-                isbn13,
-                authors,
-                original_publication_year,
-                original_title,
-                title,
-                average_rating,
-                ratings_count,
-                ratings_1,
-                ratings_2,
-                ratings_3,
-                ratings_4,
-                ratings_5,
-                image_url,
-                small_image_url
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) 
-            RETURNING *`;
-
-        const values = [
-            request.body.isbn13,
-            request.body.authors,
-            request.body.original_publication_year,
-            request.body.original_title,
-            request.body.title,
-            request.body.average_rating,
-            request.body.ratings_count,
-            request.body.ratings_1,
-            request.body.ratings_2,
-            request.body.ratings_3,
-            request.body.ratings_4,
-            request.body.ratings_5,
-            request.body.image_url,
-            request.body.small_image_url,
-        ];
-
         try {
+            // First, get the maximum ID
+            const idQuery = 'SELECT MAX(id) as max_id FROM books';
+            const idResult = await pool.query(idQuery);
+            const nextId = (idResult.rows[0].max_id || 0) + 1; // If no books exist, start with 1
+
+            // Now insert the book with the new ID
+            const theQuery = `
+                INSERT INTO books(
+                    id,
+                    isbn13,
+                    authors,
+                    publication_year,
+                    original_title,
+                    title,
+                    rating_avg,
+                    rating_count,
+                    rating_1_star,
+                    rating_2_star,
+                    rating_3_star,
+                    rating_4_star,
+                    rating_5_star,
+                    image_url,
+                    image_small_url
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) 
+                RETURNING *`;
+
+            const values = [
+                nextId,
+                request.body.isbn13,
+                request.body.authors,
+                request.body.original_publication_year, // Make sure this matches the DB column name
+                request.body.original_title,
+                request.body.title,
+                request.body.average_rating, // This should match rating_avg in DB
+                request.body.ratings_count, // This should match rating_count in DB
+                request.body.ratings_1, // This should match rating_1_star in DB
+                request.body.ratings_2, // This should match rating_2_star in DB
+                request.body.ratings_3, // This should match rating_3_star in DB
+                request.body.ratings_4, // This should match rating_4_star in DB
+                request.body.ratings_5, // This should match rating_5_star in DB
+                request.body.image_url,
+                request.body.small_image_url, // This should match image_small_url in DB
+            ];
+
             const result = await pool.query(theQuery, values);
             // Return the newly created book
             response.status(201).send({
                 book: result.rows[0],
             });
         } catch (error) {
-            if (error.detail && error.detail.includes('already exists')) {
-                console.error('ISBN already exists');
-                response.status(400).send({
-                    message: 'ISBN already exists',
-                });
-            } else {
-                // Log the error
-                console.error('DB Query error on POST book');
-                console.error(error);
-                response.status(500).send({
-                    message: 'server error - contact support',
-                });
-            }
+            // Log the error
+            console.error('DB Query error on POST book');
+            console.error(error);
+            response.status(500).send({
+                message: 'server error - contact support',
+            });
         }
     }
 );
