@@ -95,14 +95,4 @@ FROM clean_books;
 SELECT *
 FROM book_ratings;
 
-
-
-
-
-
-
-
-
-
-
-
+COPY clean_books FROM '/docker-entrypoint-initdb.d/cleaned_books_v2.csv' WITH CSV HEADER;

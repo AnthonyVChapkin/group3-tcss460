@@ -13,5 +13,5 @@ services:
         container_name: lecture-db
         volumes:
             - ~/apps/postgres:/var/lib/postgresql/data
-            - ./data/books.csv:/docker-entrypoint-initdb.d/books.csv
-            - ./data/init.sql:/docker-entrypoint-initdb.d/init.sql
+            - ./data/cleaned_books_v2.csv:/docker-entrypoint-initdb.d/cleaned_books_v2.csv
+            - ./data/books-table-setup.sql:/docker-entrypoint-initdb.d/books-table-setup.sql

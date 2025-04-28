@@ -1,0 +1,726 @@
+{
+	"info": {
+		"_postman_id": "d28ff3cd-af33-4c07-b450-d703d13e0d54",
+		"name": "Api books test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44170125",
+		"_collection_link": "https://petermadin.postman.co/workspace/Messages~a71a6062-1fcf-4f82-8a64-231b7113bb99/collection/44170125-d28ff3cd-af33-4c07-b450-d703d13e0d54?action=share&source=collection_link&creator=44170125"
+	},
+	"item": [
+		{
+			"name": "Test add Success 201",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Generate a random ISBN-13 (ensuring it's unique)\r",
+							"const generateISBN13 = () => {\r",
+							"    // Real ISBN-13 starts with 978 or 979\r",
+							"    return \"978\" + Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');\r",
+							"};\r",
+							"\r",
+							"// Random year between 2020 and 2025\r",
+							"const publicationYear = Math.floor(Math.random() * 6) + 2020;\r",
+							"\r",
+							"// Random title\r",
+							"const title = pm.variables.replaceIn('{{$randomProductName}}');\r",
+							"const originalTitle = title + \" (Original Edition)\";\r",
+							"\r",
+							"// Random author\r",
+							"const author = pm.variables.replaceIn('{{$randomFullName}}');\r",
+							"\r",
+							"// Random ratings (with higher numbers for higher ratings to simulate real-world distribution)\r",
+							"const ratings1 = Math.floor(Math.random() * 100) + 1;\r",
+							"const ratings2 = Math.floor(Math.random() * 200) + 100;\r",
+							"const ratings3 = Math.floor(Math.random() * 300) + 200;\r",
+							"const ratings4 = Math.floor(Math.random() * 400) + 300;\r",
+							"const ratings5 = Math.floor(Math.random() * 500) + 400;\r",
+							"\r",
+							"// Random image URLs\r",
+							"const imageId = Math.floor(Math.random() * 1000);\r",
+							"const imageUrl = `https://example.com/books/covers/${imageId}.jpg`;\r",
+							"const smallImageUrl = `https://example.com/books/covers/small/${imageId}.jpg`;\r",
+							"\r",
+							"// Create ISBN variable for later test verification\r",
+							"const isbn13 = generateISBN13();\r",
+							"pm.collectionVariables.set('isbn13', isbn13);\r",
+							"\r",
+							"// Store all book data for validation in tests\r",
+							"const bookData = {\r",
+							"    isbn13: isbn13,\r",
+							"    original_publication_year: publicationYear,\r",
+							"    original_title: originalTitle,\r",
+							"    title: title,\r",
+							"    image_url: imageUrl,\r",
+							"    small_image_url: smallImageUrl,\r",
+							"    authors: author,\r",
+							"    ratings_1: ratings1,\r",
+							"    ratings_2: ratings2,\r",
+							"    ratings_3: ratings3,\r",
+							"    ratings_4: ratings4,\r",
+							"    ratings_5: ratings5\r",
+							"};\r",
+							"\r",
+							"// Store all values in collection variables for use in tests\r",
+							"pm.collectionVariables.set('bookData', JSON.stringify(bookData));\r",
+							"\r",
+							"// Set request body\r",
+							"pm.request.body.raw = JSON.stringify(bookData);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Get our test data\r",
+							"const bookData = JSON.parse(pm.collectionVariables.get('bookData'));\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"// Test status code\r",
+							"pm.test(\"Response status should be 201\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Test response structure\r",
+							"pm.test(\"Response should contain book object\", () => {\r",
+							"    pm.expect(response).to.have.property('book');\r",
+							"});\r",
+							"\r",
+							"// Test book properties match what we sent\r",
+							"pm.test(\"Book ISBN13 should match what we sent\", () => {\r",
+							"    pm.expect(response.book.isbn13).to.equal(bookData.isbn13);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Book title should match what we sent\", () => {\r",
+							"    pm.expect(response.book.title).to.equal(bookData.title);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Book authors should match what we sent\", () => {\r",
+							"    pm.expect(response.book.authors).to.equal(bookData.authors);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Book publication year should match what we sent\", () => {\r",
+							"    pm.expect(response.book.original_publication_year).to.equal(bookData.original_publication_year);\r",
+							"});\r",
+							"\r",
+							"// Test that the response includes ratings data\r",
+							"pm.test(\"Book should include rating information\", () => {\r",
+							"    pm.expect(response.book).to.have.property('ratings_1');\r",
+							"    pm.expect(response.book).to.have.property('ratings_2');\r",
+							"    pm.expect(response.book).to.have.property('ratings_3');\r",
+							"    pm.expect(response.book).to.have.property('ratings_4');\r",
+							"    pm.expect(response.book).to.have.property('ratings_5');\r",
+							"    pm.expect(response.book).to.have.property('average_rating');\r",
+							"});\r",
+							"\r",
+							"// Calculate expected average rating to verify server calculation\r",
+							"const totalRatings = bookData.ratings_1 + bookData.ratings_2 + bookData.ratings_3 + \r",
+							"                    bookData.ratings_4 + bookData.ratings_5;\r",
+							"const weightedSum = (bookData.ratings_1 * 1) + (bookData.ratings_2 * 2) + \r",
+							"                   (bookData.ratings_3 * 3) + (bookData.ratings_4 * 4) + \r",
+							"                   (bookData.ratings_5 * 5);\r",
+							"const expectedAvgRating = parseFloat((weightedSum / totalRatings).toFixed(2));\r",
+							"\r",
+							"pm.test(\"Average rating calculation should be correct\", () => {\r",
+							"    pm.expect(response.book.average_rating).to.equal(expectedAvgRating);\r",
+							"});\r",
+							"\r",
+							"// Save the created book ID for potential cleanup or future tests\r",
+							"if (response && response.book && response.book.isbn13) {\r",
+							"    pm.collectionVariables.set('lastCreatedBookISBN', response.book.isbn13);\r",
+							"}\r",
+							"\r",
+							"console.log(\"Successfully created book with ISBN:\", response.book.isbn13);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdCIsInJvbGUiOjEsImlkIjoxLCJpYXQiOjE3NDU3MzYyMzAsImV4cCI6MTc0Njk0NTgzMH0.6MeRJzaEwVmdseyXKvyw87oiwTK_RHIK3tWkXApfGmE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"isbn13\": \"{{isbn13}}\",\r\n    \"original_publication_year\": {{publicationYear}},\r\n    \"original_title\": \"{{originalTitle}}\",\r\n    \"title\": \"{{title}}\",\r\n    \"image_url\": \"{{imageUrl}}\",\r\n    \"small_image_url\": \"{{smallImageUrl}}\",\r\n    \"authors\": \"{{author}}\",\r\n    \"ratings_1\": {{ratings1}},\r\n    \"ratings_2\": {{ratings2}},\r\n    \"ratings_3\": {{ratings3}},\r\n    \"ratings_4\": {{ratings4}},\r\n    \"ratings_5\": {{ratings5}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/book",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test error 400: ISBN exists",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Use an ISBN that exists in the database\r",
+							"const existingISBN = \"9780385732550\"; // This ISBN is for \"The Giver\"\r",
+							"pm.collectionVariables.set('existingISBN', existingISBN);\r",
+							"\r",
+							"// Create book data with the existing ISBN\r",
+							"const bookData = {\r",
+							"    isbn13: existingISBN,\r",
+							"    original_publication_year: 1993,\r",
+							"    original_title: \"The Giver\",\r",
+							"    title: \"The Giver (The Giver, #1)\",\r",
+							"    image_url: \"https://images.gr-assets.com/books/1342493368m/3636.jpg\",\r",
+							"    small_image_url: \"https://images.gr-assets.com/books/1342493368s/3636.jpg\",\r",
+							"    authors: \"Lois Lowry\",\r",
+							"    ratings_1: 26497,\r",
+							"    ratings_2: 59652,\r",
+							"    ratings_3: 225326,\r",
+							"    ratings_4: 448691,\r",
+							"    ratings_5: 585279\r",
+							"};"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 400 for duplicate ISBN\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message should indicate ISBN already exists\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property('message');\r",
+							"    pm.expect(response.message).to.equal(\"ISBN already exists\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdCIsInJvbGUiOjEsImlkIjoxLCJpYXQiOjE3NDU3MzYyMzAsImV4cCI6MTc0Njk0NTgzMH0.6MeRJzaEwVmdseyXKvyw87oiwTK_RHIK3tWkXApfGmE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"isbn13\": \"{{existingISBN}}\",\r\n    \"original_publication_year\": 1993,\r\n    \"original_title\": \"The Giver\",\r\n    \"title\": \"The Giver (The Giver, #1)\",\r\n    \"image_url\": \"https://images.gr-assets.com/books/1342493368m/3636.jpg\",\r\n    \"small_image_url\": \"https://images.gr-assets.com/books/1342493368s/3636.jpg\",\r\n    \"authors\": \"Lois Lowry\",\r\n    \"ratings_1\": 26497,\r\n    \"ratings_2\": 59652,\r\n    \"ratings_3\": 225326,\r\n    \"ratings_4\": 448691,\r\n    \"ratings_5\": 585279\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/book",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test error 400: Missing Parameters (author)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 400 for missing parameters\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message should indicate missing required information\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property('message');\r",
+							"    pm.expect(response.message).to.equal(\"Missing required information - please refer to documentation\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdCIsInJvbGUiOjEsImlkIjoxLCJpYXQiOjE3NDU3MzYyMzAsImV4cCI6MTc0Njk0NTgzMH0.6MeRJzaEwVmdseyXKvyw87oiwTK_RHIK3tWkXApfGmE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"isbn13\": \"9781234567890\",\r\n    \"original_publication_year\": 2022,\r\n    \"original_title\": \"Missing author test\",\r\n    \"title\": \"Test Book Title\",\r\n    \"image_url\": \"https://example.com/image.jpg\",\r\n    \"small_image_url\": \"https://example.com/small_image.jpg\",\r\n    \"ratings_1\": 10000,\r\n    \"ratings_2\": 20000,\r\n    \"ratings_3\": 30000,\r\n    \"ratings_4\": 40000,\r\n    \"ratings_5\": 50000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/book",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test error 400: Missing Parameters (title)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 400 for missing parameters\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message should indicate missing required information\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property('message');\r",
+							"    pm.expect(response.message).to.equal(\"Missing required information - please refer to documentation\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdCIsInJvbGUiOjEsImlkIjoxLCJpYXQiOjE3NDU3MzYyMzAsImV4cCI6MTc0Njk0NTgzMH0.6MeRJzaEwVmdseyXKvyw87oiwTK_RHIK3tWkXApfGmE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"isbn13\": \"9781234567890\",\r\n    \"authors\": \"Test Author\",\r\n    \"original_publication_year\": 2022,\r\n    \"original_title\": \"Missing title test\",\r\n    \"image_url\": \"https://example.com/image.jpg\",\r\n    \"small_image_url\": \"https://example.com/small_image.jpg\",\r\n    \"ratings_1\": 10000,\r\n    \"ratings_2\": 20000,\r\n    \"ratings_3\": 30000,\r\n    \"ratings_4\": 40000,\r\n    \"ratings_5\": 50000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/book",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test error 400: Missing Parameters (ratings)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 400 for missing parameters\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message should indicate invalid or missing rating values\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property('message');\r",
+							"    pm.expect(response.message).to.equal(\"Invalid or missing rating values - please refer to documentation\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdCIsInJvbGUiOjEsImlkIjoxLCJpYXQiOjE3NDU3MzYyMzAsImV4cCI6MTc0Njk0NTgzMH0.6MeRJzaEwVmdseyXKvyw87oiwTK_RHIK3tWkXApfGmE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"isbn13\": \"9781234567890\",\r\n    \"authors\": \"Test Author\",\r\n    \"original_publication_year\": 2022,\r\n    \"original_title\": \"Missing ratings test\",\r\n    \"title\": \"Test Book Title\",\r\n    \"image_url\": \"https://example.com/image.jpg\",\r\n    \"small_image_url\": \"https://example.com/small_image.jpg\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/book",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test error 400: Invalid Year (>2025)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 400 for invalid publication year\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message should indicate invalid publication year\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property('message');\r",
+							"    pm.expect(response.message).to.equal(\"Invalid or missing publication year - please refer to documentation\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdCIsInJvbGUiOjEsImlkIjoxLCJpYXQiOjE3NDU3MzYyMzAsImV4cCI6MTc0Njk0NTgzMH0.6MeRJzaEwVmdseyXKvyw87oiwTK_RHIK3tWkXApfGmE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"isbn13\": \"9781234566661\",\r\n    \"original_publication_year\": 2100, // year > 2025\r\n    \"original_title\": \"Invalid Year Test\",\r\n    \"title\": \"Invalid Year Test\",\r\n    \"image_url\": \"https://example.com/image.jpg\",\r\n    \"small_image_url\": \"https://example.com/small_image.jpg\",\r\n    \"authors\": \"Test Author\",\r\n    \"ratings_1\": 10000,\r\n    \"ratings_2\": 20000,\r\n    \"ratings_3\": 30000,\r\n    \"ratings_4\": 40000,\r\n    \"ratings_5\": 50000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/book",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test error 400: Invalid Year (<0)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 400 for invalid publication year\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message should indicate invalid publication year\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property('message');\r",
+							"    pm.expect(response.message).to.equal(\"Invalid or missing publication year - please refer to documentation\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdCIsInJvbGUiOjEsImlkIjoxLCJpYXQiOjE3NDU3MzYyMzAsImV4cCI6MTc0Njk0NTgzMH0.6MeRJzaEwVmdseyXKvyw87oiwTK_RHIK3tWkXApfGmE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"isbn13\": \"9781234566661\",\r\n    \"original_publication_year\": -420, // year > 2025\r\n    \"original_title\": \"Invalid Year Test\",\r\n    \"title\": \"Invalid Year Test\",\r\n    \"image_url\": \"https://example.com/image.jpg\",\r\n    \"small_image_url\": \"https://example.com/small_image.jpg\",\r\n    \"authors\": \"Test Author\",\r\n    \"ratings_1\": 10000,\r\n    \"ratings_2\": 20000,\r\n    \"ratings_3\": 30000,\r\n    \"ratings_4\": 40000,\r\n    \"ratings_5\": 50000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/book",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test error 400: JSON Error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 400 for invalid publication year\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message should indicate invalid publication year\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property('message');\r",
+							"    pm.expect(response.message).to.equal(\"Invalid or missing publication year - please refer to documentation\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdCIsInJvbGUiOjEsImlkIjoxLCJpYXQiOjE3NDU3MzYyMzAsImV4cCI6MTc0Njk0NTgzMH0.6MeRJzaEwVmdseyXKvyw87oiwTK_RHIK3tWkXApfGmE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"isbn13\": \"9781234566661\",\r\n    \"original_publication_year\": -420, // year > 2025\r\n    \"original_title\": \"Invalid Year Test\",\r\n    \"title\": \"Invalid Year Test\",\r\n    \"image_url\": \"https://example.com/image.jpg\",\r\n    \"small_image_url\": \"https://example.com/small_image.jpg\",\r\n    \"authors\": \"Test Author\",\r\n    \"ratings_1\": 10000,\r\n    \"ratings_2\": 20000,\r\n    \"ratings_3\": 30000,\r\n    \"ratings_4\": 40000,\r\n    \"ratings_5\": 50000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/book",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test error 400: JSON Error (text body)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 400 for malformed JSON\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response should contain SyntaxError for malformed JSON\", () => {\r",
+							"    const responseBody = pm.response.text();\r",
+							"    pm.expect(responseBody).to.include(\"SyntaxError\");\r",
+							"    pm.expect(responseBody).to.include(\"Expected double-quoted property name in JSON\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Ensure Content-Type is still set to application/json\r",
+							"pm.request.headers.add({\r",
+							"    key: 'Content-Type',\r",
+							"    value: 'application/json'\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdCIsInJvbGUiOjEsImlkIjoxLCJpYXQiOjE3NDU3MzYyMzAsImV4cCI6MTc0Njk0NTgzMH0.6MeRJzaEwVmdseyXKvyw87oiwTK_RHIK3tWkXApfGmE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"isbn13\": \"9781234567892\",\r\n    \"title\": \"Malformed JSON Test\",\r\n    \"authors\": \"Test Author\",\r\n    publication_year: 2022\r\n}",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/book",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"book"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "isbn13",
+			"value": ""
+		},
+		{
+			"key": "bookData",
+			"value": ""
+		},
+		{
+			"key": "lastCreatedBookISBN",
+			"value": ""
+		},
+		{
+			"key": "existingISBN",
+			"value": ""
+		}
+	]
+}
