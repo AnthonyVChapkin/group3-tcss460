@@ -6,7 +6,7 @@ const getBookByISBNRouter: Router = express.Router();
 const isStringProvided = validationFunctions.isStringProvided;
 
 /**
- * @api {get} /c/book/:isbn13 Request a book by ISBN‑13
+ * @api {get} /c/get_book_by_ISBN/:isbn13 Request a book by ISBN‑13
  *
  * @apiDescription Retrieve a single book from the database that matches the supplied ISBN‑13.
  *
