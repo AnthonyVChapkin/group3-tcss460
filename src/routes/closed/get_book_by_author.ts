@@ -43,7 +43,7 @@ getBookByAuthorRouter.get('/:authorName', async (req: Request, res: Response) =>
             JOIN author_books AS ab ON a.author_id = ab.author_id
             JOIN books AS b ON ab.isbn13 = b.isbn13
             LEFT JOIN book_ratings AS br ON b.isbn13 = br.isbn13
-            WHERE a.author_name ILIKE '%' || $1 || '%'
+            WHERE a.author ILIKE '%' || $1 || '%'
         `;
 
         const { rows } = await pool.query(query, [authorName.trim()]);
