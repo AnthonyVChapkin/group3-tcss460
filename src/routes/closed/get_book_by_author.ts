@@ -5,7 +5,7 @@ const getBookByAuthorRouter: Router = express.Router();
 const { isStringProvided } = validationFunctions;
 
 /**
- * @api {get} /c/book/author/:authorName Find books by author
+ * @api {get} /c/get_book_by_author/authorName Find books by author
  *
  * @apiDescription Find books written by the specified author.
  *
@@ -31,14 +31,21 @@ getBookByAuthorRouter.get('/:authorName', async (req: Request, res: Response) =>
 
     try {
         const query = `
-            SELECT b.isbn13, b.original_publication_year, b.original_title, b.title, b.image_url, b.small_image_url,
-                   br.ratings_1, br.ratings_2, br.ratings_3, br.ratings_4, br.ratings_5
-            FROM authors a
-            JOIN author_books ab ON a.author_id = ab.author_id
-            JOIN books b ON ab.isbn13 = b.isbn13
-            LEFT JOIN book_ratings br ON b.isbn13 = br.isbn13
+            SELECT 
+                b.isbn13, 
+                b.original_publication_year, 
+                b.original_title, 
+                b.title, 
+                b.image_url, 
+                b.small_image_url, 
+                br.ratings_1, br.ratings_2, br.ratings_3, br.ratings_4, br.ratings_5
+            FROM authors AS a
+            JOIN author_books AS ab ON a.author_id = ab.author_id
+            JOIN books AS b ON ab.isbn13 = b.isbn13
+            LEFT JOIN book_ratings AS br ON b.isbn13 = br.isbn13
             WHERE a.author_name ILIKE '%' || $1 || '%'
         `;
+
         const { rows } = await pool.query(query, [authorName.trim()]);
 
         if (rows.length === 0) {
@@ -48,7 +55,8 @@ getBookByAuthorRouter.get('/:authorName', async (req: Request, res: Response) =>
         res.status(200).json({ books: rows });
     } catch (error) {
         console.error('Error fetching books by author:', error);
-        res.status(500).json({ message: 'Server error - please try again later' });
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+        
     }
 });
 
