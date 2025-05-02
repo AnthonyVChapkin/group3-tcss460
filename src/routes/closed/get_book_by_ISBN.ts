@@ -33,29 +33,22 @@ const isStringProvided = validationFunctions.isStringProvided;
  * @apiSuccess {String}  book.image_url             Cover image URL
  * @apiSuccess {String}  book.small_image_url       Small cover image URL
  *
- * @apiError (400: Missing ISBN) {String} message "Missing required information – please provide a 13‑digit ISBN"
  * @apiError (404: ISBN not found) {String} message "ISBN not found"
  * @apiError (400: Malformed ISBN) {String} message "Invalid ISBN – must be a 13‑digit string"
- * @apiError (400: JSON Error) {String} message "malformed JSON in parameters"
+ * @apiError (500: Server Error) {String} message "server error - contact support"
  */
 getBookByISBNRouter.get(
     '/:isbn13',
     (request: Request, response: Response, next: NextFunction) => {
         const { isbn13 } = request.params;
+
         // basic validation: must be provided and 13 digits (all numbers or digits & hyphens already stripped by client)
-        if (isStringProvided(isbn13)) {
-            const digitsOnly = isbn13.replace(/[^0-9X]/gi, '');
-            if (digitsOnly.length === 13 && /^\d{13}$/.test(digitsOnly)) {
-                next();
-            } else {
-                response.status(400).send({
-                    message: 'Invalid ISBN - must be a 13-digit string',
-                });
-            }
+        const digitsOnly = isbn13.replace(/[^0-9X]/gi, '');
+        if (digitsOnly.length === 13 && /^\d{13}$/.test(digitsOnly)) {
+            next();
         } else {
             response.status(400).send({
-                message:
-                    'Missing required information - please provide a 13-digit ISBN',
+                message: 'Invalid ISBN - must be a 13-digit string',
             });
         }
     },
