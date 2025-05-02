@@ -31,8 +31,8 @@ const getBookByAuthorRouter: Router = express.Router();
  * @apiSuccess {String}  book.image_url             Cover image URL
  * @apiSuccess {String}  book.small_image_url       Small cover image URL
  *
- * @apiError (404) No books found
- * @apiError (500) Server error
+ * @apiError (404: Books not found) {String} message "No books found"
+ * @apiError (500: Server Error) message "server error - contact support"
  */
 getBookByAuthorRouter.get('/:author', async (req: Request, res: Response) => {
     const { author } = req.params;
