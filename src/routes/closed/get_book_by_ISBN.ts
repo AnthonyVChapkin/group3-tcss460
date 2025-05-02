@@ -1,9 +1,12 @@
 import express, { NextFunction, Request, Response, Router } from 'express';
-import { pool, validationFunctions } from '../../core/utilities';
+import { pool } from '../../core/utilities';
 
 const getBookByISBNRouter: Router = express.Router();
 
-const isStringProvided = validationFunctions.isStringProvided;
+// Used to pass the cleaned isbn13 to the next function.
+interface ISBNRequest extends Request {
+    cleanedISBN13?: string;
+}
 
 /**
  * @api {get} /c/get_book_by_ISBN/:isbn13 Request a book by ISBN‑13
@@ -39,12 +42,13 @@ const isStringProvided = validationFunctions.isStringProvided;
  */
 getBookByISBNRouter.get(
     '/:isbn13',
-    (request: Request, response: Response, next: NextFunction) => {
+    (request: ISBNRequest, response: Response, next: NextFunction) => {
         const { isbn13 } = request.params;
 
-        // basic validation: must be provided and 13 digits (all numbers or digits & hyphens already stripped by client)
+        // basic validation: we must have 13 digits, and all non-digits are stripped.
         const digitsOnly = isbn13.replace(/[^0-9X]/gi, '');
         if (digitsOnly.length === 13 && /^\d{13}$/.test(digitsOnly)) {
+            request.cleanedISBN13 = digitsOnly; // pass clean isbn13 to next function
             next();
         } else {
             response.status(400).send({
@@ -52,9 +56,8 @@ getBookByISBNRouter.get(
             });
         }
     },
-    async (request: Request, response: Response) => {
+    async (request: ISBNRequest, response: Response) => {
         try {
-            const { isbn13 } = request.params;
             const query = `
                     SELECT 
                     b.isbn13,
@@ -93,7 +96,7 @@ getBookByISBNRouter.get(
                     b.small_image_url;
             `;
 
-            const result = await pool.query(query, [isbn13]);
+            const result = await pool.query(query, [request.cleanedISBN13]);
 
             if (result.rowCount === 0) {
                 response.status(404).send({
