@@ -17,7 +17,7 @@ const getBookByAuthorRouter: Router = express.Router();
  *
  * @apiSuccess (Success 200) {Object[]} books List of books written by the author.
  * @apiSuccess {String}  book.isbn13   The ISBN‑13 of the book
- * @apiSuccess {String}  book.authors  Array of author names
+ * @apiSuccess {String}  book.author   The author of the book
  * @apiSuccess {Number}  book.original_publication_year Year of original publication
  * @apiSuccess {String}  book.original_title        The book's original title
  * @apiSuccess {String}  book.title                 The display title
