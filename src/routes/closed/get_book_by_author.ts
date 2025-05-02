@@ -1,8 +1,7 @@
 import express, { Request, Response, Router } from 'express';
-import { pool, validationFunctions } from '../../core/utilities';
+import { pool } from '../../core/utilities';
 
 const getBookByAuthorRouter: Router = express.Router();
-const { isStringProvided } = validationFunctions;
 
 /**
  * @api {get} /c/get_book_by_author/authorName Find books by author
@@ -18,19 +17,16 @@ const { isStringProvided } = validationFunctions;
  *
  * @apiSuccess (Success 200) {Object[]} books List of books written by the author.
  *
- * @apiError (400) Missing author name
  * @apiError (404) No books found
  * @apiError (500) Server error
  */
-getBookByAuthorRouter.get('/:authorName', async (req: Request, res: Response) => {
-    const { authorName } = req.params;
+getBookByAuthorRouter.get(
+    '/:authorName',
+    async (req: Request, res: Response) => {
+        const { authorName } = req.params;
 
-    if (!isStringProvided(authorName)) {
-        return res.status(400).json({ message: 'Author name must be provided' });
-    }
-
-    try {
-        const query = `
+        try {
+            const query = `
             SELECT 
                 b.isbn13, 
                 b.original_publication_year, 
@@ -46,18 +42,24 @@ getBookByAuthorRouter.get('/:authorName', async (req: Request, res: Response) =>
             WHERE a.author ILIKE '%' || $1 || '%'
         `;
 
-        const { rows } = await pool.query(query, [authorName.trim()]);
+            const { rows } = await pool.query(query, [authorName.trim()]);
 
-        if (rows.length === 0) {
-            return res.status(404).json({ message: 'No books found for the given author' });
+            if (rows.length === 0) {
+                return res
+                    .status(404)
+                    .json({ message: 'No books found for the given author' });
+            }
+
+            res.status(200).json({ books: rows });
+        } catch (error) {
+            console.error('Error fetching books by author:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Server error',
+                error: error.message,
+            });
         }
-
-        res.status(200).json({ books: rows });
-    } catch (error) {
-        console.error('Error fetching books by author:', error);
-        res.status(500).json({ success: false, message: 'Server error', error: error.message });
-        
     }
-});
+);
 
 export { getBookByAuthorRouter };
