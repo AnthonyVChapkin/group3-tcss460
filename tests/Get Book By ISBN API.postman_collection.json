@@ -1,22 +1,19 @@
 {
 	"info": {
-		"_postman_id": "3bfc9f6b-c58b-4fed-a1d9-5f142ac428b8",
+		"_postman_id": "150a85bd-41d4-459b-8f65-8004cac2ef29",
 		"name": "Get Book By ISBN API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "43671832"
+		"_exporter_id": "29221157"
 	},
 	"item": [
 		{
-			"name": "Get Existing Book By ISBN",
+			"name": "GET Book by ISBN: Valid ISBN",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"pm.test(\"Status is 404\", () => pm.response.to.have.status(404));",
-							"pm.test(\"Message key present\", () => {",
-							"  pm.expect(pm.response.json()).to.have.property(\"message\");",
-							"});"
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -29,10 +26,11 @@
 							"pm.test(\"Status is 200\", () => {",
 							"  pm.response.to.have.status(200);",
 							"});",
+							"",
 							"pm.test(\"Has book object\", () => {",
 							"  const json = pm.response.json();",
 							"  pm.expect(json).to.have.property(\"book\");",
-							"  pm.expect(json.book).to.have.property(\"isbn13\", \"9780316769488\");",
+							"  pm.expect(json.book).to.have.property(\"isbn13\", \"9780553146970\");",
 							"});"
 						],
 						"type": "text/javascript",
@@ -54,14 +52,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseURL}}/c/get_book_by_isbn/9781594744760",
+					"raw": "{{baseURL}}/c/get_book_by_isbn/9780553146970",
 					"host": [
 						"{{baseURL}}"
 					],
 					"path": [
 						"c",
 						"get_book_by_isbn",
-						"9781594744760"
+						"9780553146970"
 					]
 				}
 			},
@@ -135,11 +133,18 @@
 						"type": "text/javascript",
 						"packages": {}
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
 				}
 			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -153,15 +158,6 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
 					"raw": "{{baseURL}}/c/get_book_by_isbn/978159",
 					"host": [
@@ -171,6 +167,96 @@
 						"c",
 						"get_book_by_isbn",
 						"978159"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Book By ISBN: Valid ISBN With Non-digits",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 200\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Has book object\", () => {\r",
+							"  const json = pm.response.json();\r",
+							"  pm.expect(json).to.have.property(\"book\");\r",
+							"  pm.expect(json.book).to.have.property(\"isbn13\", \"9780553146970\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/c/get_book_by_isbn/9780$55*31feojcuije469fweofjwuifewhiuf70",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"c",
+						"get_book_by_isbn",
+						"9780$55*31feojcuije469fweofjwuifewhiuf70"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Book By ISBN: 13 Char String With Less Than 13 Digits",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 400\", () => pm.response.to.have.status(400))"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/c/get_book_by_isbn/978055314697L",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"c",
+						"get_book_by_isbn",
+						"978055314697L"
 					]
 				}
 			},

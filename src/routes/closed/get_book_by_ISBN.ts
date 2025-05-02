@@ -18,7 +18,7 @@ interface ISBNRequest extends Request {
  *
  * @apiUse JWT
  *
- * @apiParam  {String} isbn13  The 13‑digit ISBN of the desired book.
+ * @apiParam  {String} isbn13  The 13‑digit ISBN of the desired book. Can include non-digits.
  *
  * @apiSuccess (Success 200) {Object} book  The book object that matches the ISBN.
  * @apiSuccess {String}  book.isbn13   The ISBN‑13 of the book
