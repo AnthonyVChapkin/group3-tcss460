@@ -19,19 +19,19 @@ const isStringProvided = validationFunctions.isStringProvided;
  *
  * @apiSuccess (Success 200) {Object} book  The book object that matches the ISBN.
  * @apiSuccess {String}  book.isbn13   The ISBN‑13 of the book
- * @apiSuccess {String}  book.authors  The author(s) of the book
- * @apiSuccess {Number}  book.publication_year      Year of original publication
+ * @apiSuccess {String[]}  book.authors  Array of author names
+ * @apiSuccess {Number}  book.original_publication_year Year of original publication
  * @apiSuccess {String}  book.original_title        The book's original title
  * @apiSuccess {String}  book.title                 The display title
- * @apiSuccess {Number}  book.rating_avg            Average rating (0‑5)
- * @apiSuccess {Number}  book.rating_count          Total number of ratings
- * @apiSuccess {Number}  book.rating_1_star         1‑star rating count
- * @apiSuccess {Number}  book.rating_2_star         2‑star rating count
- * @apiSuccess {Number}  book.rating_3_star         3‑star rating count
- * @apiSuccess {Number}  book.rating_4_star         4‑star rating count
- * @apiSuccess {Number}  book.rating_5_star         5‑star rating count
+ * @apiSuccess {Number}  book.average_rating        Average rating (0‑5)
+ * @apiSuccess {Number}  book.ratings_count          Total number of ratings
+ * @apiSuccess {Number}  book.ratings_1         1‑star rating count
+ * @apiSuccess {Number}  book.ratings_2         2‑star rating count
+ * @apiSuccess {Number}  book.ratings_3         3‑star rating count
+ * @apiSuccess {Number}  book.ratings_4         4‑star rating count
+ * @apiSuccess {Number}  book.ratings_5         5‑star rating count
  * @apiSuccess {String}  book.image_url             Cover image URL
- * @apiSuccess {String}  book.image_small_url       Small cover image URL
+ * @apiSuccess {String}  book.small_image_url       Small cover image URL
  *
  * @apiError (400: Missing ISBN) {String} message "Missing required information – please provide a 13‑digit ISBN"
  * @apiError (404: ISBN not found) {String} message "ISBN not found"
@@ -54,14 +54,52 @@ getBookByISBNRouter.get(
             }
         } else {
             response.status(400).send({
-                message: 'Missing required information - please provide a 13-digit ISBN',
+                message:
+                    'Missing required information - please provide a 13-digit ISBN',
             });
         }
     },
     async (request: Request, response: Response) => {
         try {
             const { isbn13 } = request.params;
-            const query = 'SELECT * FROM books WHERE isbn13 = $1';
+            const query = `
+                    SELECT 
+                    b.isbn13,
+                    ARRAY_AGG(a.author) AS authors,
+                    b.original_publication_year,
+                    b.original_title,
+                    b.title,
+                    ROUND((br.ratings_1*1.0 + br.ratings_2*2 + br.ratings_3*3 + br.ratings_4*4 + br.ratings_5*5) /
+                    (br.ratings_1 + br.ratings_2 + br.ratings_3 + br.ratings_4 + br.ratings_5), 2)::FLOAT AS average_rating,
+                    br.ratings_1 + br.ratings_2 + br.ratings_3 + br.ratings_4 + br.ratings_5 AS ratings_count,
+                    br.ratings_1,
+                    br.ratings_2,
+                    br.ratings_3,
+                    br.ratings_4,
+                    br.ratings_5,
+                    b.image_url,
+                    b.small_image_url
+                    FROM books b JOIN author_books ab
+                    ON b.isbn13 = ab.isbn13
+                    JOIN authors a
+                    ON a.author_id = ab.author_id
+                    JOIN book_ratings br
+                    ON br.isbn13 = ab.isbn13
+                    WHERE b.isbn13 = $1
+                    GROUP BY
+                    b.isbn13,
+                    b.original_publication_year,
+                    b.original_title,
+                    b.title,
+                    br.ratings_1,
+                    br.ratings_2,
+                    br.ratings_3,
+                    br.ratings_4,
+                    br.ratings_5,
+                    b.image_url,
+                    b.small_image_url;
+            `;
+
             const result = await pool.query(query, [isbn13]);
 
             if (result.rowCount === 0) {
