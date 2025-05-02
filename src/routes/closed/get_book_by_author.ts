@@ -16,6 +16,20 @@ const getBookByAuthorRouter: Router = express.Router();
  * @apiParam {String} author Name of the author.
  *
  * @apiSuccess (Success 200) {Object[]} books List of books written by the author.
+ * @apiSuccess {String}  book.isbn13   The ISBN‑13 of the book
+ * @apiSuccess {String}  book.authors  Array of author names
+ * @apiSuccess {Number}  book.original_publication_year Year of original publication
+ * @apiSuccess {String}  book.original_title        The book's original title
+ * @apiSuccess {String}  book.title                 The display title
+ * @apiSuccess {Number}  book.average_rating        Average rating (0‑5)
+ * @apiSuccess {Number}  book.ratings_count          Total number of ratings
+ * @apiSuccess {Number}  book.ratings_1         1‑star rating count
+ * @apiSuccess {Number}  book.ratings_2         2‑star rating count
+ * @apiSuccess {Number}  book.ratings_3         3‑star rating count
+ * @apiSuccess {Number}  book.ratings_4         4‑star rating count
+ * @apiSuccess {Number}  book.ratings_5         5‑star rating count
+ * @apiSuccess {String}  book.image_url             Cover image URL
+ * @apiSuccess {String}  book.small_image_url       Small cover image URL
  *
  * @apiError (404) No books found
  * @apiError (500) Server error
