@@ -4,9 +4,9 @@ import { pool } from '../../core/utilities';
 const getBookByAuthorRouter: Router = express.Router();
 
 /**
- * @api {get} /c/get_book_by_author/:author Find books by author
+ * @api {get} /c/get_book_by_author/:author Request books by author name
  *
- * @apiDescription Find books written by the specified author.
+ * @apiDescription Retrieve books written by the specified author.
  *
  * @apiName GetBooksByAuthor
  * @apiGroup Book
