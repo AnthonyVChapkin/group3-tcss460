@@ -6,6 +6,48 @@ const getBooksByOffsetRouter: Router = express.Router();
 const isNumberProvided = validationFunctions.isNumberProvided;
 const isStringProvided = validationFunctions.isStringProvided;
 
+/**
+ * @api {get} /c/books/offset Request paginated list of books
+ *
+ * @apiDescription Retrieve a paginated list of books with optional total count by default.
+ *
+ * @apiName GetBooksByOffset
+ * @apiGroup Book
+ *
+ * @apiUse JWT
+ *
+ * @apiParam (Query Parameter(s)) {Number} [limit=10]   Maximum number of books to return per page. If not provided or invalid, sets to default of 10.
+ * @apiParam (Query Parameter(s)) {Number} [offset=0]   Number of books to skip before starting to collect the result set. If not provided or invalid, sets to default of 0.
+ * @apiParam (Query Parameter(s)) {Boolean} [getTotal=true] Whether to include the total number of books in the response. If not provided or invalid, sets to default of true.
+ *
+ * @apiExample {url} Example usage:
+ *     /c/books/offset?limit=5&offset=10&getTotal=false
+ *
+ * @apiSuccess (Success 200) {Object} pagination         Pagination metadata.
+ * @apiSuccess {Number} pagination.totalRecords          Total number of records (null if getTotal is false).
+ * @apiSuccess {Number} pagination.limit                 The page size used in the query.
+ * @apiSuccess {Number} pagination.offset                The offset used in the query.
+ * @apiSuccess {Number} pagination.nextPage              Offset to use for the next page.
+ * @apiSuccess {Boolean} pagination.hasMore              Whether there are more pages left (null if getTotal is false).
+ *
+ * @apiSuccess {Object[]} books                          List of books.
+ * @apiSuccess {String}  books.isbn13                    The ISBN‑13 of the book.
+ * @apiSuccess {String[]} books.authors                  List of authors.
+ * @apiSuccess {Number}  books.original_publication_year Year of original publication.
+ * @apiSuccess {String}  books.original_title            The book's original title.
+ * @apiSuccess {String}  books.title                     The display title.
+ * @apiSuccess {Number}  books.average_rating            Average rating (0‑5), rounded to two decimal places.
+ * @apiSuccess {Number}  books.ratings_count             Total number of ratings.
+ * @apiSuccess {Number}  books.ratings_1                 1‑star rating count.
+ * @apiSuccess {Number}  books.ratings_2                 2‑star rating count.
+ * @apiSuccess {Number}  books.ratings_3                 3‑star rating count.
+ * @apiSuccess {Number}  books.ratings_4                 4‑star rating count.
+ * @apiSuccess {Number}  books.ratings_5                 5‑star rating count.
+ * @apiSuccess {String}  books.image_url                 Cover image URL.
+ * @apiSuccess {String}  books.small_image_url           Small cover image URL.
+ *
+ * @apiError (500: Server Error) message "server error - contact support"
+ */
 getBooksByOffsetRouter.get(
     '/',
     async (request: Request, response: Response) => {
