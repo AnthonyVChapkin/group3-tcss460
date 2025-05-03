@@ -8,7 +8,55 @@ const isNumberProvided = validationFunctions.isNumberProvided;
 getBooksByOffsetRouter.get(
     '/',
     (request: Request, response: Response, next: NextFunction) => {
-        response.status(200).send('hello world');
+        // Validation stolen from closed_message.ts.
+        const limit: number =
+            isNumberProvided(request.query.limit) && +request.query.limit > 0
+                ? +request.query.limit
+                : 10;
+        const offset: number =
+            isNumberProvided(request.query.offset) && +request.query.offset >= 0
+                ? +request.query.offset
+                : 0;
+
+        const pageQuery = `
+                    SELECT 
+					b.isbn13,
+					ARRAY_AGG(a.author) AS authors,
+					b.original_publication_year,
+					b.original_title,
+					b.title,
+					ROUND((br.ratings_1*1.0 + br.ratings_2*2.0 + br.ratings_3*3.0 + br.ratings_4*4.0 + br.ratings_5*5.0) /
+					NULLIF((br.ratings_1 + br.ratings_2 + br.ratings_3 + br.ratings_4 + br.ratings_5), 0), 2) AS average_rating,
+					br.ratings_1 + br.ratings_2 + br.ratings_3 + br.ratings_4 + br.ratings_5 AS ratings_count,
+					br.ratings_1,
+					br.ratings_2,
+					br.ratings_3,
+					br.ratings_4,
+					br.ratings_5,
+					b.image_url,
+					b.small_image_url
+					FROM books b JOIN author_books ab
+					ON b.isbn13 = ab.isbn13
+					JOIN authors a
+					ON a.author_id = ab.author_id
+					JOIN book_ratings br
+					ON br.isbn13 = ab.isbn13
+					GROUP BY
+					b.isbn13,
+					b.original_publication_year,
+					b.original_title,
+					b.title,
+					br.ratings_1,
+					br.ratings_2,
+					br.ratings_3,
+					br.ratings_4,
+					br.ratings_5,
+					b.image_url,
+					b.small_image_url
+					ORDER BY b.isbn13
+					LIMIT 10
+					OFFSET 0;
+        `;
     }
 );
 

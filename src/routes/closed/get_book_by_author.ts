@@ -46,7 +46,7 @@ getBookByAuthorRouter.get('/:author', async (req: Request, res: Response) => {
                 b.original_title, 
                 b.title,
 				ROUND((br.ratings_1*1.0 + br.ratings_2*2 + br.ratings_3*3 + br.ratings_4*4 + br.ratings_5*5) /
-                NULLIF((br.ratings_1 + br.ratings_2 + br.ratings_3 + br.ratings_4 + br.ratings_5), 2), 0)::FLOAT AS average_rating,
+                NULLIF((br.ratings_1 + br.ratings_2 + br.ratings_3 + br.ratings_4 + br.ratings_5), 0), 2) AS average_rating,
 				br.ratings_1 + br.ratings_2 + br.ratings_3 + br.ratings_4 + br.ratings_5 AS ratings_count,
                 br.ratings_1, br.ratings_2, br.ratings_3, br.ratings_4, br.ratings_5,
 				b.image_url, 
