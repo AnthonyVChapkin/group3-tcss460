@@ -84,6 +84,7 @@ getBooksByOffsetRouter.get(
                     limit,
                     offset,
                     nextPage: limit + offset,
+                    hasMore: getTotal ? offset + limit < count : null,
                 },
                 books: rows,
             });
