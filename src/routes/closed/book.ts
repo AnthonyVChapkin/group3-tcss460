@@ -30,20 +30,20 @@ const isNumberProvided = validationFunctions.isNumberProvided;
  * @apiBody {String} small_image_url The URL to the book's small cover image
  *
  * @apiSuccess (Success 201) {Object} book The newly created book object
- * @apiSuccess {String}  book.isbn13   The ISBN‑13 of the book
- * @apiSuccess {Number}  book.original_publication_year Year of original publication
- * @apiSuccess {String}  book.original_title        The book's original title
- * @apiSuccess {String}  book.title                 The display title
- * @apiSuccess {String}  book.image_url             Cover image URL
- * @apiSuccess {String}  book.small_image_url       Small cover image URL
- * @apiSuccess {String}  book.authors               The author(s) of the book
- * @apiSuccess {Number}  book.average_rating        Average rating (0‑5)
- * @apiSuccess {Number}  book.ratings_count          Total number of ratings
- * @apiSuccess {Number}  book.ratings_1         1‑star rating count
- * @apiSuccess {Number}  book.ratings_2         2‑star rating count
- * @apiSuccess {Number}  book.ratings_3         3‑star rating count
- * @apiSuccess {Number}  book.ratings_4         4‑star rating count
- * @apiSuccess {Number}  book.ratings_5         5‑star rating count
+ * @apiSuccess (Success 201) {String}  book.isbn13   The ISBN‑13 of the book
+ * @apiSuccess (Success 201) {Number}  book.original_publication_year Year of original publication
+ * @apiSuccess (Success 201) {String}  book.original_title        The book's original title
+ * @apiSuccess (Success 201) {String}  book.title                 The display title
+ * @apiSuccess (Success 201) {String}  book.image_url             Cover image URL
+ * @apiSuccess (Success 201) {String}  book.small_image_url       Small cover image URL
+ * @apiSuccess (Success 201) {String}  book.authors               The author(s) of the book
+ * @apiSuccess (Success 201) {Number}  book.average_rating        Average rating (0‑5)
+ * @apiSuccess (Success 201) {Number}  book.ratings_count          Total number of ratings
+ * @apiSuccess (Success 201) {Number}  book.ratings_1         1‑star rating count
+ * @apiSuccess (Success 201) {Number}  book.ratings_2         2‑star rating count
+ * @apiSuccess (Success 201) {Number}  book.ratings_3         3‑star rating count
+ * @apiSuccess (Success 201) {Number}  book.ratings_4         4‑star rating count
+ * @apiSuccess (Success 201) {Number}  book.ratings_5         5‑star rating count
  *
  * @apiError (400: ISBN exists) {String} message "ISBN already exists"
  * @apiError (400: Missing Parameters) {String} message "Missing required information - please refer to documentation"
