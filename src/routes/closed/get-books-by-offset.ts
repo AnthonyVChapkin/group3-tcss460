@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response, Router } from 'express';
+import express, { Request, Response, Router } from 'express';
 import { pool, validationFunctions } from '../../core/utilities';
 
 const getBooksByOffsetRouter: Router = express.Router();
@@ -7,7 +7,7 @@ const isNumberProvided = validationFunctions.isNumberProvided;
 
 getBooksByOffsetRouter.get(
     '/',
-    (request: Request, response: Response, next: NextFunction) => {
+    async (request: Request, response: Response) => {
         // Validation stolen from closed_message.ts.
         const limit: number =
             isNumberProvided(request.query.limit) && +request.query.limit > 0
@@ -54,9 +54,35 @@ getBooksByOffsetRouter.get(
 					b.image_url,
 					b.small_image_url
 					ORDER BY b.isbn13
-					LIMIT 10
-					OFFSET 0;
+					LIMIT $1
+					OFFSET $2;
         `;
+
+        try {
+            const { rows } = await pool.query(pageQuery, [limit, offset]);
+
+            const result = await pool.query(
+                'SELECT count(*) AS exact_count FROM books;'
+            );
+
+            const count = result.rows[0].exact_count;
+
+            response.status(200).send({
+                pagination: {
+                    totalRecords: count,
+                    limit,
+                    offset,
+                    nextPage: limit + offset,
+                },
+                books: rows,
+            });
+        } catch (error) {
+            console.error('Database error on get books by offset');
+            console.error(error);
+            response
+                .status(500)
+                .send({ message: 'server error - contact support' });
+        }
     }
 );
 
