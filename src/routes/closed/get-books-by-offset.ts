@@ -4,6 +4,7 @@ import { pool, validationFunctions } from '../../core/utilities';
 const getBooksByOffsetRouter: Router = express.Router();
 
 const isNumberProvided = validationFunctions.isNumberProvided;
+const isStringProvided = validationFunctions.isStringProvided;
 
 getBooksByOffsetRouter.get(
     '/',
@@ -12,11 +13,18 @@ getBooksByOffsetRouter.get(
         const limit: number =
             isNumberProvided(request.query.limit) && +request.query.limit > 0
                 ? +request.query.limit
-                : 10;
+                : 10; // Default limit of 10
         const offset: number =
             isNumberProvided(request.query.offset) && +request.query.offset >= 0
                 ? +request.query.offset
-                : 0;
+                : 0; // Default offset of 0
+
+        // Decides if we count all rows in the table or not.
+        const getTotal: boolean =
+            isStringProvided(request.query.getTotal) &&
+            request.query.getTotal == 'false'
+                ? false
+                : true; // Default is true
 
         const pageQuery = `
                     SELECT 
@@ -61,11 +69,14 @@ getBooksByOffsetRouter.get(
         try {
             const { rows } = await pool.query(pageQuery, [limit, offset]);
 
-            const result = await pool.query(
-                'SELECT count(*) AS exact_count FROM books;'
-            );
-
-            const count = result.rows[0].exact_count;
+            // Counts total rows in table if getTotal is true. Otherwise count is null.
+            let count = null;
+            if (getTotal) {
+                const result = await pool.query(
+                    'SELECT count(*) AS exact_count FROM books;'
+                );
+                count = result.rows[0].exact_count;
+            }
 
             response.status(200).send({
                 pagination: {
