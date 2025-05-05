@@ -46,7 +46,26 @@ During the Alpha Sprint, the primary forms of communication were:
 
 - Met on a discord call to discuss the cleaning of the CSV file, and how to split up work. 4/28/2025.
 
-During the Alpha Sprint, the primary forms of communication were:
+During the Beta Sprint, the primary forms of communication were:
+
+- **Discord**: For messaging and calling.
+
+## Beta Sprint Comments
+
+## Beta Sprint II Contribution
+
+### Group Members:
+
+- **Anthony Chapkin**: Cleaned up beta I features, and implemented get all books with pagination route with docs.
+- **Peter Madin**: Implemented route to change a user password and documented it.
+- **Riley Mansfield**: Implemented route to update a books ratings and documented it.
+- **Zakariye Luqman**: Created unit tests for all three routes.
+
+## Beta II Sprint Meetings
+
+- Met on a discord call to discuss how to split up work, and reflect on Beta I. 5/1/2025.
+
+During the Beta II Sprint, the primary forms of communication were:
 
 - **Discord**: For messaging and calling.
 
