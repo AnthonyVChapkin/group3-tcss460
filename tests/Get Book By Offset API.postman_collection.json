@@ -1,0 +1,269 @@
+{
+	"info": {
+		"_postman_id": "9e61a967-df66-4405-af8c-82c98ef1b7c2",
+		"name": "Get Book By Offset API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43671832"
+	},
+	"item": [
+		{
+			"name": "Default Pagination Test",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"const json = pm.response.json();",
+							"",
+							"pm.test(\"Default limit is 10\", () => {",
+							"    pm.expect(json.pagination.limit).to.eql(10);",
+							"});",
+							"pm.test(\"Default offset is 0\", () => {",
+							"    pm.expect(json.pagination.offset).to.eql(0);",
+							"});",
+							"",
+							"pm.test(\"hasMore is a boolean\", () => {",
+							"    pm.expect(json.pagination.hasMore).to.be.a(\"boolean\");",
+							"});",
+							"",
+							"pm.test(\"books array exists and length ≤ limit\", () => {",
+							"    pm.expect(json.books).to.be.an(\"array\");",
+							"    pm.expect(json.books.length).to.be.at.most(json.pagination.limit);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQm9iIiwicm9sZSI6MSwiaWQiOjIsImlhdCI6MTc0NTgxNDA4MSwiZXhwIjoxNzQ3MDIzNjgxfQ.t889liilRs1n7akJMCjzuLh7wSt3v8rxIxeXWLdNR7Q",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/c/books/offset",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"c",
+						"books",
+						"offset"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Offset=10, Limit=5",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// 1) Status code is 200",
+							"pm.test(\"Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// 2) Pagination reflects our query",
+							"const json = pm.response.json();",
+							"pm.test(\"limit == 5\", () => pm.expect(json.pagination.limit).to.eql(5));",
+							"pm.test(\"offset == 10\", () => pm.expect(json.pagination.offset).to.eql(10));",
+							"pm.test(\"nextPage == offset + limit\", () => {",
+							"    pm.expect(json.pagination.nextPage).to.eql(15);",
+							"});",
+							"",
+							"// 3) totalRecords & hasMore should be null when getTotal=false",
+							"pm.test(\"totalRecords is null\", () => {",
+							"    pm.expect(json.pagination.totalRecords).to.be.null;",
+							"});",
+							"pm.test(\"hasMore is null\", () => {",
+							"    pm.expect(json.pagination.hasMore).to.be.null;",
+							"});",
+							"",
+							"// 4) books array exists and length ≤ 5",
+							"pm.test(\"books array exists and length ≤ 5\", () => {",
+							"    pm.expect(json.books).to.be.an(\"array\");",
+							"    pm.expect(json.books.length).to.be.at.most(5);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQm9iIiwicm9sZSI6MSwiaWQiOjIsImlhdCI6MTc0NTgxNDA4MSwiZXhwIjoxNzQ3MDIzNjgxfQ.t889liilRs1n7akJMCjzuLh7wSt3v8rxIxeXWLdNR7Q",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/c/books/offset?limit=5&offset=10&getTotal=false",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"c",
+						"books",
+						"offset"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "5"
+						},
+						{
+							"key": "offset",
+							"value": "10"
+						},
+						{
+							"key": "getTotal",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid Value Test",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Tests for invalid limit (negative) with offset=10 and getTotal=false",
+							"pm.test(\"Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const json = pm.response.json();",
+							"",
+							"// 1) Invalid limit should fall back to default (10)",
+							"pm.test(\"limit defaults to 10 when given negative\", () => {",
+							"    pm.expect(json.pagination.limit).to.eql(10);",
+							"});",
+							"",
+							"// 2) offset should reflect the valid query value",
+							"pm.test(\"offset == 10\", () => {",
+							"    pm.expect(json.pagination.offset).to.eql(10);",
+							"});",
+							"",
+							"// 3) nextPage should be offset + default limit",
+							"pm.test(\"nextPage == 20\", () => {",
+							"    pm.expect(json.pagination.nextPage).to.eql(20);",
+							"});",
+							"",
+							"// 4) getTotal=false means totalRecords and hasMore are null",
+							"pm.test(\"totalRecords is null when getTotal=false\", () => {",
+							"    pm.expect(json.pagination.totalRecords).to.be.null;",
+							"});",
+							"pm.test(\"hasMore is null when getTotal=false\", () => {",
+							"    pm.expect(json.pagination.hasMore).to.be.null;",
+							"});",
+							"",
+							"// 5) books array exists and length is ≤ default limit",
+							"pm.test(\"books array exists and length ≤ 10\", () => {",
+							"    pm.expect(json.books).to.be.an(\"array\");",
+							"    pm.expect(json.books.length).to.be.at.most(10);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQm9iIiwicm9sZSI6MSwiaWQiOjIsImlhdCI6MTc0NTgxNDA4MSwiZXhwIjoxNzQ3MDIzNjgxfQ.t889liilRs1n7akJMCjzuLh7wSt3v8rxIxeXWLdNR7Q",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/c/books/offset?limit=-5&offset=10&getTotal=false",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"c",
+						"books",
+						"offset"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "-5"
+						},
+						{
+							"key": "offset",
+							"value": "10"
+						},
+						{
+							"key": "getTotal",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
