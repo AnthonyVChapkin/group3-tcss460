@@ -1,0 +1,126 @@
+{
+	"info": {
+		"_postman_id": "337bef03-b6f4-4ec1-b8ff-6901bed9c9ea",
+		"name": "Update Ratings Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43671832"
+	},
+	"item": [
+		{
+			"name": "Vaild Rating Update",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 for valid ratings update\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const body = pm.response.json();",
+							"pm.test(\"Response indicates successful update\", () => {",
+							"    pm.expect(body).to.have.property(\"success\", true);",
+							"    pm.expect(body).to.have.property(\"message\", \"Book ratings updated successfully\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQm9iIiwicm9sZSI6MSwiaWQiOjIsImlhdCI6MTc0NTgxNDA4MSwiZXhwIjoxNzQ3MDIzNjgxfQ.t889liilRs1n7akJMCjzuLh7wSt3v8rxIxeXWLdNR7Q",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"ratings_1\": 5,\n  \"ratings_2\": 1,      \n  \"ratings_3\": 0,\n  \"ratings_4\": 2,\n  \"ratings_5\": 3\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/c/update_book_ratings/9780061120080",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"c",
+						"update_book_ratings",
+						"9780061120080"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid Rating Update",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400 for invalid ratings\", () => {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"const err = pm.response.json();",
+							"pm.test(\"Response indicates invalid rating values\", () => {",
+							"    pm.expect(err).to.have.property(\"success\", false);",
+							"    pm.expect(err).to.have.property(\"message\", \"Missing or invalid rating values\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQm9iIiwicm9sZSI6MSwiaWQiOjIsImlhdCI6MTc0NTgxNDA4MSwiZXhwIjoxNzQ3MDIzNjgxfQ.t889liilRs1n7akJMCjzuLh7wSt3v8rxIxeXWLdNR7Q",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"ratings_1\": 5,\n  \"ratings_2\": -1,      \n  \"ratings_3\": 0,\n  \"ratings_4\": 2,\n  \"ratings_5\": 3\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/c/update_book_ratings/9780061120080",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"c",
+						"update_book_ratings",
+						"9780061120080"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
