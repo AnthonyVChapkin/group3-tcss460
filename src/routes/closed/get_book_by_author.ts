@@ -66,7 +66,7 @@ getBookByAuthorRouter.get('/:author', async (req: Request, res: Response) => {
                 .json({ message: 'No books found for the given author' });
         }
 
-        res.status(200).json({ books: rows });
+        res.status(200).json({ success: true, data: rows });
     } catch (error) {
         console.error('Error fetching books by author:', error);
         res.status(500).json({
