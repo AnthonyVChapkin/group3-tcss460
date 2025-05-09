@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response, Router } from 'express';
 import { pool, validationFunctions } from '../../core/utilities';
+import { IBook, IBookLegacy, convertLegacyBookToNew, convertNewBookToLegacy } from '../../core/models';
 
 const bookRouter: Router = express.Router();
 
@@ -217,9 +218,32 @@ bookRouter.post(
                 ),
             };
 
+            // Create a legacy book object first
+            const legacyBook: IBookLegacy = {
+                isbn13: responseBook.isbn13,
+                authors: responseBook.authors,
+                original_publication_year: responseBook.original_publication_year,
+                original_title: responseBook.original_title,
+                title: responseBook.title,
+                average_rating: responseBook.average_rating,
+                ratings_count: responseBook.ratings_1 + responseBook.ratings_2 +
+                    responseBook.ratings_3 + responseBook.ratings_4 +
+                    responseBook.ratings_5,
+                ratings_1: responseBook.ratings_1,
+                ratings_2: responseBook.ratings_2,
+                ratings_3: responseBook.ratings_3,
+                ratings_4: responseBook.ratings_4,
+                ratings_5: responseBook.ratings_5,
+                image_url: responseBook.image_url,
+                small_image_url: responseBook.small_image_url
+            };
+
+            // Convert to the new format
+            const newFormatBook: IBook = convertLegacyBookToNew(legacyBook);
+
             // Return the newly created book
             response.status(201).send({
-                book: responseBook,
+                book: newFormatBook,
             });
         } catch (error) {
             await client.query('ROLLBACK');
