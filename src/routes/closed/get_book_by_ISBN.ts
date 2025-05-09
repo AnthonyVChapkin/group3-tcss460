@@ -1,5 +1,7 @@
 import express, { NextFunction, Request, Response, Router } from 'express';
 import { pool } from '../../core/utilities';
+import { IBook, IBookLegacy, convertLegacyBookToNew } from '../../core/models';
+
 
 const getBookByISBNRouter: Router = express.Router();
 
@@ -103,8 +105,37 @@ getBookByISBNRouter.get(
                     message: 'ISBN not found',
                 });
             } else {
+                // Extract the book data from the first row
+                const bookData = result.rows[0];
+
+                // Format authors from array to string (if it's returned as an array)
+                const authors = Array.isArray(bookData.authors)
+                    ? bookData.authors.join(', ')
+                    : bookData.authors;
+
+                // Create a book object in the legacy format as our starting point
+                const legacyBook: IBookLegacy = {
+                    isbn13: bookData.isbn13,
+                    authors: authors,
+                    original_publication_year: bookData.original_publication_year,
+                    original_title: bookData.original_title,
+                    title: bookData.title,
+                    average_rating: bookData.average_rating,
+                    ratings_count: bookData.ratings_count,
+                    ratings_1: bookData.ratings_1,
+                    ratings_2: bookData.ratings_2,
+                    ratings_3: bookData.ratings_3,
+                    ratings_4: bookData.ratings_4,
+                    ratings_5: bookData.ratings_5,
+                    image_url: bookData.image_url,
+                    small_image_url: bookData.small_image_url
+                };
+
+                // Convert to the new format using our helper function
+                const book: IBook = convertLegacyBookToNew(legacyBook);
+
                 response.status(200).send({
-                    book: result.rows[0],
+                    book: book
                 });
             }
         } catch (error) {

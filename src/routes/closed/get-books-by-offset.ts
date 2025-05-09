@@ -1,5 +1,6 @@
 import express, { Request, Response, Router } from 'express';
 import { pool, validationFunctions } from '../../core/utilities';
+import { IBookLegacy, convertLegacyBookToNew } from '../../core/models';
 
 const getBooksByOffsetRouter: Router = express.Router();
 
@@ -120,6 +121,35 @@ getBooksByOffsetRouter.get(
                 count = result.rows[0].exact_count;
             }
 
+            // Transform the results to use the new interface
+            const transformedBooks = rows.map(row => {
+                // Format authors if needed (might be an array from ARRAY_AGG)
+                const authors = Array.isArray(row.authors)
+                    ? row.authors.join(', ')
+                    : row.authors;
+
+                // Create a legacy format book object
+                const legacyBook: IBookLegacy = {
+                    isbn13: row.isbn13,
+                    authors: authors,
+                    original_publication_year: row.original_publication_year,
+                    original_title: row.original_title,
+                    title: row.title,
+                    average_rating: row.average_rating,
+                    ratings_count: row.ratings_count,
+                    ratings_1: row.ratings_1,
+                    ratings_2: row.ratings_2,
+                    ratings_3: row.ratings_3,
+                    ratings_4: row.ratings_4,
+                    ratings_5: row.ratings_5,
+                    image_url: row.image_url,
+                    small_image_url: row.small_image_url
+                };
+
+                // Convert to the new format
+                return convertLegacyBookToNew(legacyBook);
+            });
+
             response.status(200).send({
                 pagination: {
                     totalRecords: count,
@@ -128,7 +158,7 @@ getBooksByOffsetRouter.get(
                     nextPage: limit + offset,
                     hasMore: getTotal ? offset + limit < count : null,
                 },
-                books: rows,
+                books: transformedBooks,
             });
         } catch (error) {
             console.error('Database error on get books by offset');

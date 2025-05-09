@@ -1,5 +1,7 @@
 import express, { Request, Response, Router } from 'express';
 import { pool } from '../../core/utilities';
+import { IBookLegacy, convertLegacyBookToNew } from '../../core/models';
+
 
 const getBookByAuthorRouter: Router = express.Router();
 
@@ -66,7 +68,31 @@ getBookByAuthorRouter.get('/:author', async (req: Request, res: Response) => {
                 .json({ message: 'No books found for the given author' });
         }
 
-        res.status(200).json({ success: true, data: rows });
+        // Transform the results to use the new interface
+        const transformedBooks = rows.map(row => {
+            // Create a legacy format book object
+            const legacyBook: IBookLegacy = {
+                isbn13: row.isbn13,
+                authors: row.author, // Note: in this route it's 'author' not 'authors'
+                original_publication_year: row.original_publication_year,
+                original_title: row.original_title,
+                title: row.title,
+                average_rating: row.average_rating,
+                ratings_count: row.ratings_count,
+                ratings_1: row.ratings_1,
+                ratings_2: row.ratings_2,
+                ratings_3: row.ratings_3,
+                ratings_4: row.ratings_4,
+                ratings_5: row.ratings_5,
+                image_url: row.image_url,
+                small_image_url: row.small_image_url
+            };
+
+            // Convert to the new format
+            return convertLegacyBookToNew(legacyBook);
+        });
+
+        res.status(200).json({ success: true, books: transformedBooks });
     } catch (error) {
         console.error('Error fetching books by author:', error);
         res.status(500).json({
