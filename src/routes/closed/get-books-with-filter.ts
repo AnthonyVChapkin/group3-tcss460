@@ -99,7 +99,13 @@ getBooksWithFilterRouter.get(
                     JOIN author_books ab ON b.isbn13 = ab.isbn13
                     JOIN authors a ON a.author_id = ab.author_id
                     JOIN book_ratings br ON br.isbn13 = ab.isbn13
-					WHERE a.author ILIKE '%' || $1 || '%'
+					WHERE b.isbn13 IN (
+                    SELECT b2.isbn13
+                    FROM books b2
+                    JOIN author_books ab2 ON b2.isbn13 = ab2.isbn13
+                    JOIN authors a2 ON a2.author_id = ab2.author_id
+                    WHERE a2.author ILIKE '%' || $1 || '%'
+                    )
 					AND b.title ILIKE '%' || $2 || '%'
 					AND b.original_publication_year BETWEEN $3 AND $4
 					AND
@@ -150,7 +156,30 @@ getBooksWithFilterRouter.get(
             let count = null;
             if (getTotal) {
                 const result = await pool.query(
-                    'SELECT count(*) AS exact_count FROM books;'
+                    `
+                    SELECT COUNT(*) AS exact_count
+                    FROM (
+					SELECT b.isbn13
+					FROM
+                    books b 
+                    JOIN author_books ab ON b.isbn13 = ab.isbn13
+                    JOIN authors a ON a.author_id = ab.author_id
+                    JOIN book_ratings br ON br.isbn13 = ab.isbn13
+					WHERE a.author ILIKE '%' || $1 || '%'
+					AND b.title ILIKE '%' || $2 || '%'
+					AND b.original_publication_year BETWEEN $3 AND $4
+					AND
+					ROUND(
+                    (br.ratings_1 * 1.0 + br.ratings_2 * 2.0 + br.ratings_3 * 3.0 + br.ratings_4 * 4.0 + br.ratings_5 * 5.0) /
+                    NULLIF((br.ratings_1 + br.ratings_2 + br.ratings_3 + br.ratings_4 + br.ratings_5), 0), 2
+                    ) BETWEEN $5 AND $6
+					AND
+					(br.ratings_1 + br.ratings_2 + br.ratings_3 + br.ratings_4 + br.ratings_5)
+					BETWEEN $7 AND $8::numeric
+					GROUP BY b.isbn13
+					);
+                    `,
+                    paramValues.slice(0, 8)
                 );
                 count = result.rows[0].exact_count;
             }
