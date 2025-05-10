@@ -1,0 +1,219 @@
+{
+	"info": {
+		"_postman_id": "9d20ed75-8625-4492-ae76-a1d2994cdbfb",
+		"name": "Get Books With Filter Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29221157"
+	},
+	"item": [
+		{
+			"name": "Get Books With No Params",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has correct structure\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property(\"pagination\");\r",
+							"    pm.expect(response).to.have.property(\"books\");\r",
+							"    pm.expect(response.books).to.be.an(\"array\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Pagination data is valid\", () => {\r",
+							"    const { pagination } = pm.response.json();\r",
+							"    pm.expect(pagination.totalRecords).to.be.a(\"string\");\r",
+							"    pm.expect(parseInt(pagination.totalRecords)).to.be.greaterThan(0);\r",
+							"    pm.expect(pagination.limit).to.eql(10);\r",
+							"    pm.expect(pagination.offset).to.eql(0);\r",
+							"    pm.expect(pagination.nextPage).to.eql(10);\r",
+							"    pm.expect(pagination.hasMore).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Books array contains 10 items\", () => {\r",
+							"    pm.expect(pm.response.json().books.length).to.eql(10);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"First book has valid structure\", () => {\r",
+							"    const firstBook = pm.response.json().books[0];\r",
+							"    pm.expect(firstBook.isbn13).to.be.a(\"string\");\r",
+							"    pm.expect(firstBook.authors).to.be.an(\"array\");\r",
+							"    firstBook.authors.forEach(author => {\r",
+							"        pm.expect(author).to.be.a('string');\r",
+							"    });\r",
+							"    pm.expect(firstBook.publication).to.be.a(\"number\");\r",
+							"    pm.expect(firstBook.ratings.average).to.be.a(\"string\");\r",
+							"    pm.expect(firstBook.icons.large).to.include(\"http\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"All books have required fields\", () => {\r",
+							"    const books = pm.response.json().books;\r",
+							"    books.forEach(book => {\r",
+							"        pm.expect(book).to.have.all.keys(\r",
+							"            \"isbn13\", \"authors\", \"publication\", \"original_title\", \r",
+							"            \"title\", \"ratings\", \"icons\"\r",
+							"        );\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/c/books/filter",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"books",
+						"filter"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Params",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has correct structure\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property(\"pagination\");\r",
+							"    pm.expect(response).to.have.property(\"books\");\r",
+							"    pm.expect(response.books).to.be.an(\"array\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Pagination reflects getTotal=false\", () => {\r",
+							"    const { pagination } = pm.response.json();\r",
+							"    pm.expect(pagination.totalRecords).to.be.null;\r",
+							"    pm.expect(pagination.hasMore).to.be.null;\r",
+							"    pm.expect(pagination.limit).to.eql(16);\r",
+							"    pm.expect(pagination.offset).to.eql(1);\r",
+							"    pm.expect(pagination.nextPage).to.eql(17);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"First book matches filters\", () => {\r",
+							"    const { books } = pm.response.json();\r",
+							"    const firstBook = books[0];\r",
+							"\r",
+							"    pm.expect(firstBook.authors).to.include(\"J.K. Rowling\");\r",
+							"    \r",
+							"    pm.expect(firstBook.title.toLowerCase()).to.include(\"harry\");\r",
+							"    \r",
+							"    pm.expect(firstBook.publication).to.be.within(1990, 2012);\r",
+							"    \r",
+							"    pm.expect(parseFloat(firstBook.ratings.average)).to.be.within(3.5, 4.5);\r",
+							"    \r",
+							"    pm.expect(firstBook.ratings.count).to.be.within(10000, 90000);\r",
+							"    \r",
+							"    pm.expect(firstBook.isbn13).to.be.a(\"string\");\r",
+							"    pm.expect(firstBook.icons.large).to.include(\"http\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/c/books/filter?author=J.K.&title=harry&minYear=1990&maxYear=2012&minRating=3.5&maxRating=4.5&minRatingCount=10000&maxRatingCount=90000&limit=16&offset=1&getTotal=false",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"books",
+						"filter"
+					],
+					"query": [
+						{
+							"key": "author",
+							"value": "J.K."
+						},
+						{
+							"key": "title",
+							"value": "harry"
+						},
+						{
+							"key": "minYear",
+							"value": "1990"
+						},
+						{
+							"key": "maxYear",
+							"value": "2012"
+						},
+						{
+							"key": "minRating",
+							"value": "3.5"
+						},
+						{
+							"key": "maxRating",
+							"value": "4.5"
+						},
+						{
+							"key": "minRatingCount",
+							"value": "10000"
+						},
+						{
+							"key": "maxRatingCount",
+							"value": "90000"
+						},
+						{
+							"key": "limit",
+							"value": "16"
+						},
+						{
+							"key": "offset",
+							"value": "1"
+						},
+						{
+							"key": "getTotal",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
