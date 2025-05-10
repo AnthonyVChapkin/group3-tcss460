@@ -7,6 +7,58 @@ const getBooksWithFilterRouter: Router = express.Router();
 const isNumberProvided = validationFunctions.isNumberProvided;
 const isStringProvided = validationFunctions.isStringProvided;
 
+/**
+ * @api {get} /c/books/filter Request a filtered and paginated list of books
+ *
+ * @apiDescription Retrieve a paginated list of books filtered by various criteria with an optional total count.
+ *
+ * @apiName GetBooksWithFilter
+ * @apiGroup Book
+ *
+ * @apiUse JWT
+ *
+ * @apiParam (Query Parameter(s)) {String} [author='']          Filter by author name (case-insensitive partial match). Defaults to empty string if not provided (all authors).
+ * @apiParam (Query Parameter(s)) {String} [title='']           Filter by book title (case-insensitive partial match). Defaults to empty string if not provided (all titles).
+ * @apiParam (Query Parameter(s)) {Number} [minYear=0]       Minimum publication year (inclusive). Defaults to 0 if not provided, is not a number, or is less than 0.
+ * @apiParam (Query Parameter(s)) {Number} [maxYear=current] Maximum publication year (inclusive). Defaults to current year if not provided, is not a number, or is less than 0.
+ * @apiParam (Query Parameter(s)) {Number} [minRating=0]     Minimum average rating (0-5 inclusive). Defaults to 0 if not provided, is not a number, or is less than 0.
+ * @apiParam (Query Parameter(s)) {Number} [maxRating=5]     Maximum average rating (0-5 inclusive). Defaults to 5 if not provided, is not a number, or is less than 0.
+ * @apiParam (Query Parameter(s)) {Number} [minRatingCount=0] Minimum number of ratings required. Defaults to 0 if not provided, is not a number, or is less than 0.
+ * @apiParam (Query Parameter(s)) {Number} [maxRatingCount=infinity]   Maximum number of ratings allowed. Defaults to infinity if not provided, is not a number, or is less than 0.
+ * @apiParam (Query Parameter(s)) {Number} [limit=10]        Maximum books per page. Defaults to 0 if not provided, is not a number, or is less than or equal to 0.
+ * @apiParam (Query Parameter(s)) {Number} [offset=0]        Number of books to skip. Defaults to 0 if not provided, is not a number, or is less than 0.
+ * @apiParam (Query Parameter(s)) {Boolean} [getTotal=true]  Include total filtered record count. Default is true.
+ *
+ * @apiExample {url} Example usage:
+ *     /c/books/filter?author=J.K.&title=harry&minYear=2000&limit=5&maxRating=4
+ *
+ * @apiSuccess (Success 200) {Object} pagination         Pagination metadata.
+ * @apiSuccess {Number} pagination.totalRecords          Total filtered records (null if getTotal=false).
+ * @apiSuccess {Number} pagination.limit                 Page size used.
+ * @apiSuccess {Number} pagination.offset                Offset used.
+ * @apiSuccess {Number} pagination.nextPage              Offset for next page.
+ * @apiSuccess {Boolean} pagination.hasMore              More filtered pages available (null if getTotal=false).
+ *
+ * @apiSuccess {Object[]} books                          Filtered list of books.
+ * @apiSuccess {String}   books.isbn13                   ISBN-13 of the book.
+ * @apiSuccess {String[]} books.authors                  List of authors.
+ * @apiSuccess {Number}   books.publication              Year of publication.
+ * @apiSuccess {String}   books.original_title           Original publication title.
+ * @apiSuccess {String}   books.title                    Display title.
+ * @apiSuccess {Object}   books.ratings                  Rating information.
+ * @apiSuccess {Number}   books.ratings.average          Average rating (0-5, 2 decimal places).
+ * @apiSuccess {Number}   books.ratings.count            Total number of ratings.
+ * @apiSuccess {Number}   books.ratings.rating_1         1-star ratings count.
+ * @apiSuccess {Number}   books.ratings.rating_2         2-star ratings count.
+ * @apiSuccess {Number}   books.ratings.rating_3         3-star ratings count.
+ * @apiSuccess {Number}   books.ratings.rating_4         4-star ratings count.
+ * @apiSuccess {Number}   books.ratings.rating_5         5-star ratings count.
+ * @apiSuccess {Object}   books.icons                    Cover image URLs.
+ * @apiSuccess {String}   books.icons.large               Large cover image URL.
+ * @apiSuccess {String}   books.icons.small               Small cover image URL.
+ *
+ * @apiError (500: Server Error) message "server error - contact support"
+ */
 getBooksWithFilterRouter.get(
     '/',
     async (request: Request, response: Response) => {
@@ -65,7 +117,7 @@ getBooksWithFilterRouter.get(
                 ? +request.query.offset
                 : 0; // Default offset of 0
 
-        // Decides if we count all rows in the table or not.
+        // Decides if we count all rows that passed filter in the table or not.
         const getTotal: boolean =
             isStringProvided(request.query.getTotal) &&
             request.query.getTotal == 'false'
@@ -146,6 +198,7 @@ getBooksWithFilterRouter.get(
             ];
             const { rows } = await pool.query(query, paramValues);
 
+            // If getTotal is true, counts the amount of rows that passed the filter.
             let count = null;
             if (getTotal) {
                 const result = await pool.query(
