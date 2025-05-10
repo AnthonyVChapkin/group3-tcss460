@@ -10,6 +10,7 @@ import { updatePasswordRouter } from './update_password';
 import { bookRouter } from './book';
 import { getBooksByOffsetRouter } from './get-books-by-offset';
 import { getBooksWithFilterRouter } from './get-books-with-filter';
+import { deleteBooksByRangeRouter } from './delete_books_by_range';
 
 const closedRoutes: Router = express.Router();
 
@@ -23,5 +24,6 @@ closedRoutes.use('/c/update_password', checkToken, updatePasswordRouter);
 closedRoutes.use('/c/book', checkToken, bookRouter);
 closedRoutes.use('/c/books/offset', checkToken, getBooksByOffsetRouter);
 closedRoutes.use('/c/books/filter', checkToken, getBooksWithFilterRouter);
+closedRoutes.use('/c/delete_books_by_range', checkToken, deleteBooksByRangeRouter);
 
 export { closedRoutes };
