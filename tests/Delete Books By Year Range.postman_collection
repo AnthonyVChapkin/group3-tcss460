@@ -1,0 +1,945 @@
+{
+	"info": {
+		"_postman_id": "1499bfbb-0b20-4520-abf5-3c568ab7f396",
+		"name": "Book deletion by year range",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44170125",
+		"_collection_link": "https://petermadin.postman.co/workspace/Messages~a71a6062-1fcf-4f82-8a64-231b7113bb99/collection/44170125-1499bfbb-0b20-4520-abf5-3c568ab7f396?action=share&source=collection_link&creator=44170125"
+	},
+	"item": [
+		{
+			"name": "Add 2019 book",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 201 for successful book creation\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response should contain the book object with expected fields\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"book\");\r",
+							"\r",
+							"    const book = jsonData.book;\r",
+							"    pm.expect(book).to.have.property(\"isbn13\").that.is.a(\"number\"); // Changed to number\r",
+							"    pm.expect(book).to.have.property(\"authors\").that.is.a(\"string\");\r",
+							"    pm.expect(book).to.have.property(\"publication\").that.is.a(\"number\");\r",
+							"    pm.expect(book).to.have.property(\"original_title\").that.is.a(\"string\");\r",
+							"    pm.expect(book).to.have.property(\"title\").that.is.a(\"string\");\r",
+							"\r",
+							"    // Check that 'ratings' object contains all the expected properties\r",
+							"    pm.expect(book).to.have.property(\"ratings\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"average\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"count\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_1\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_2\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_3\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_4\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_5\").that.is.a(\"number\");\r",
+							"\r",
+							"    // Check that 'icons' object contains the expected properties\r",
+							"    pm.expect(book).to.have.property(\"icons\");\r",
+							"    pm.expect(book.icons).to.have.property(\"large\").that.is.a(\"string\");\r",
+							"    pm.expect(book.icons).to.have.property(\"small\").that.is.a(\"string\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"isbn13\": \"9781250301697\",\r\n  \"authors\": \"Alex Michaelides\",\r\n  \"original_publication_year\": 2019,\r\n  \"original_title\": \"The Silent Patient\",\r\n  \"title\": \"The Silent Patient\",\r\n  \"ratings_1\": 1200,\r\n  \"ratings_2\": 2500,\r\n  \"ratings_3\": 10000,\r\n  \"ratings_4\": 20000,\r\n  \"ratings_5\": 30000,\r\n  \"image_url\": \"https://images.gr-assets.com/books/1551189113l/40097951.jpg\",\r\n  \"small_image_url\": \"https://images.gr-assets.com/books/1551189113s/40097951.jpg\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/book",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add 2020 book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 201 for successful book creation\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response should contain the book object with expected fields\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"book\");\r",
+							"\r",
+							"    const book = jsonData.book;\r",
+							"    pm.expect(book).to.have.property(\"isbn13\").that.is.a(\"number\"); // Changed to number\r",
+							"    pm.expect(book).to.have.property(\"authors\").that.is.a(\"string\");\r",
+							"    pm.expect(book).to.have.property(\"publication\").that.is.a(\"number\");\r",
+							"    pm.expect(book).to.have.property(\"original_title\").that.is.a(\"string\");\r",
+							"    pm.expect(book).to.have.property(\"title\").that.is.a(\"string\");\r",
+							"\r",
+							"    // Check that 'ratings' object contains all the expected properties\r",
+							"    pm.expect(book).to.have.property(\"ratings\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"average\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"count\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_1\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_2\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_3\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_4\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_5\").that.is.a(\"number\");\r",
+							"\r",
+							"    // Check that 'icons' object contains the expected properties\r",
+							"    pm.expect(book).to.have.property(\"icons\");\r",
+							"    pm.expect(book.icons).to.have.property(\"large\").that.is.a(\"string\");\r",
+							"    pm.expect(book.icons).to.have.property(\"small\").that.is.a(\"string\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"isbn13\": \"9780525536291\",\r\n  \"authors\": \"Brit Bennett\",\r\n  \"original_publication_year\": 2020,\r\n  \"original_title\": \"The Vanishing Half\",\r\n  \"title\": \"The Vanishing Half\",\r\n  \"ratings_1\": 800,\r\n  \"ratings_2\": 2200,\r\n  \"ratings_3\": 9500,\r\n  \"ratings_4\": 18000,\r\n  \"ratings_5\": 27000,\r\n  \"image_url\": \"https://images.gr-assets.com/books/1584667417l/51791252.jpg\",\r\n  \"small_image_url\": \"https://images.gr-assets.com/books/1584667417s/51791252.jpg\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/book",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add 2021 book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 201 for successful book creation\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response should contain the book object with expected fields\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"book\");\r",
+							"\r",
+							"    const book = jsonData.book;\r",
+							"    pm.expect(book).to.have.property(\"isbn13\").that.is.a(\"number\"); // Changed to number\r",
+							"    pm.expect(book).to.have.property(\"authors\").that.is.a(\"string\");\r",
+							"    pm.expect(book).to.have.property(\"publication\").that.is.a(\"number\");\r",
+							"    pm.expect(book).to.have.property(\"original_title\").that.is.a(\"string\");\r",
+							"    pm.expect(book).to.have.property(\"title\").that.is.a(\"string\");\r",
+							"\r",
+							"    // Check that 'ratings' object contains all the expected properties\r",
+							"    pm.expect(book).to.have.property(\"ratings\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"average\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"count\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_1\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_2\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_3\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_4\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_5\").that.is.a(\"number\");\r",
+							"\r",
+							"    // Check that 'icons' object contains the expected properties\r",
+							"    pm.expect(book).to.have.property(\"icons\");\r",
+							"    pm.expect(book.icons).to.have.property(\"large\").that.is.a(\"string\");\r",
+							"    pm.expect(book.icons).to.have.property(\"small\").that.is.a(\"string\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"isbn13\": \"9780374602604\",\r\n  \"authors\": \"Sally Rooney\",\r\n  \"original_publication_year\": 2021,\r\n  \"original_title\": \"Beautiful World, Where Are You\",\r\n  \"title\": \"Beautiful World, Where Are You\",\r\n  \"ratings_1\": 900,\r\n  \"ratings_2\": 2000,\r\n  \"ratings_3\": 8500,\r\n  \"ratings_4\": 16000,\r\n  \"ratings_5\": 25000,\r\n  \"image_url\": \"https://images.gr-assets.com/books/1619443033l/56597885.jpg\",\r\n  \"small_image_url\": \"https://images.gr-assets.com/books/1619443033s/56597885.jpg\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/book",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add 2022 book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 201 for successful book creation\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response should contain the book object with expected fields\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"book\");\r",
+							"\r",
+							"    const book = jsonData.book;\r",
+							"    pm.expect(book).to.have.property(\"isbn13\").that.is.a(\"number\"); // Changed to number\r",
+							"    pm.expect(book).to.have.property(\"authors\").that.is.a(\"string\");\r",
+							"    pm.expect(book).to.have.property(\"publication\").that.is.a(\"number\");\r",
+							"    pm.expect(book).to.have.property(\"original_title\").that.is.a(\"string\");\r",
+							"    pm.expect(book).to.have.property(\"title\").that.is.a(\"string\");\r",
+							"\r",
+							"    // Check that 'ratings' object contains all the expected properties\r",
+							"    pm.expect(book).to.have.property(\"ratings\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"average\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"count\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_1\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_2\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_3\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_4\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_5\").that.is.a(\"number\");\r",
+							"\r",
+							"    // Check that 'icons' object contains the expected properties\r",
+							"    pm.expect(book).to.have.property(\"icons\");\r",
+							"    pm.expect(book.icons).to.have.property(\"large\").that.is.a(\"string\");\r",
+							"    pm.expect(book.icons).to.have.property(\"small\").that.is.a(\"string\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"isbn13\": \"9780593321201\",\r\n  \"authors\": \"Gabrielle Zevin\",\r\n  \"original_publication_year\": 2022,\r\n  \"original_title\": \"Tomorrow, and Tomorrow, and Tomorrow\",\r\n  \"title\": \"Tomorrow, and Tomorrow, and Tomorrow\",\r\n  \"ratings_1\": 700,\r\n  \"ratings_2\": 1800,\r\n  \"ratings_3\": 8000,\r\n  \"ratings_4\": 15000,\r\n  \"ratings_5\": 24000,\r\n  \"image_url\": \"https://images.gr-assets.com/books/1637783586l/58784475.jpg\",\r\n  \"small_image_url\": \"https://images.gr-assets.com/books/1637783586s/58784475.jpg\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/book",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add 2023 book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 201 for successful book creation\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response should contain the book object with expected fields\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"book\");\r",
+							"\r",
+							"    const book = jsonData.book;\r",
+							"    pm.expect(book).to.have.property(\"isbn13\").that.is.a(\"number\"); // Changed to number\r",
+							"    pm.expect(book).to.have.property(\"authors\").that.is.a(\"string\");\r",
+							"    pm.expect(book).to.have.property(\"publication\").that.is.a(\"number\");\r",
+							"    pm.expect(book).to.have.property(\"original_title\").that.is.a(\"string\");\r",
+							"    pm.expect(book).to.have.property(\"title\").that.is.a(\"string\");\r",
+							"\r",
+							"    // Check that 'ratings' object contains all the expected properties\r",
+							"    pm.expect(book).to.have.property(\"ratings\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"average\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"count\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_1\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_2\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_3\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_4\").that.is.a(\"number\");\r",
+							"    pm.expect(book.ratings).to.have.property(\"rating_5\").that.is.a(\"number\");\r",
+							"\r",
+							"    // Check that 'icons' object contains the expected properties\r",
+							"    pm.expect(book).to.have.property(\"icons\");\r",
+							"    pm.expect(book.icons).to.have.property(\"large\").that.is.a(\"string\");\r",
+							"    pm.expect(book.icons).to.have.property(\"small\").that.is.a(\"string\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"isbn13\": \"9780063250833\",\r\n  \"authors\": \"R.F. Kuang\",\r\n  \"original_publication_year\": 2023,\r\n  \"original_title\": \"Yellowface\",\r\n  \"title\": \"Yellowface\",\r\n  \"ratings_1\": 600,\r\n  \"ratings_2\": 1600,\r\n  \"ratings_3\": 7500,\r\n  \"ratings_4\": 14000,\r\n  \"ratings_5\": 23000,\r\n  \"image_url\": \"https://images.gr-assets.com/books/1672165695l/62047984.jpg\",\r\n  \"small_image_url\": \"https://images.gr-assets.com/books/1672165695s/62047984.jpg\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/book",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete books by range",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Tests script for the Delete Books by Year Range response\r",
+							"// This will validate that the response matches the expected format and contains valid data\r",
+							"\r",
+							"// Parse the response\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"// Basic response structure validation\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains success flag\", function () {\r",
+							"    pm.expect(response).to.have.property('success');\r",
+							"    pm.expect(response.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains message\", function () {\r",
+							"    pm.expect(response).to.have.property('message');\r",
+							"    pm.expect(response.message).to.be.a('string');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains deletedCount\", function () {\r",
+							"    pm.expect(response).to.have.property('deletedCount');\r",
+							"    pm.expect(response.deletedCount).to.be.a('number');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains books array\", function () {\r",
+							"    pm.expect(response).to.have.property('books');\r",
+							"    pm.expect(response.books).to.be.an('array');\r",
+							"});\r",
+							"\r",
+							"// If books were deleted, validate the first book's structure\r",
+							"if (response.books && response.books.length > 0) {\r",
+							"    const book = response.books[0];\r",
+							"    \r",
+							"    pm.test(\"Book has correct structure\", function () {\r",
+							"        // Check main book properties\r",
+							"        pm.expect(book).to.have.property('isbn13');\r",
+							"        pm.expect(book.isbn13).to.be.a('number');\r",
+							"        \r",
+							"        pm.expect(book).to.have.property('authors');\r",
+							"        pm.expect(book.authors).to.be.a('string');\r",
+							"        \r",
+							"        pm.expect(book).to.have.property('publication');\r",
+							"        pm.expect(book.publication).to.be.a('number');\r",
+							"        \r",
+							"        pm.expect(book).to.have.property('original_title');\r",
+							"        pm.expect(book.original_title).to.be.a('string');\r",
+							"        \r",
+							"        pm.expect(book).to.have.property('title');\r",
+							"        pm.expect(book.title).to.be.a('string');\r",
+							"        \r",
+							"        // Check ratings object\r",
+							"        pm.expect(book).to.have.property('ratings');\r",
+							"        pm.expect(book.ratings).to.be.an('object');\r",
+							"        pm.expect(book.ratings).to.have.property('average');\r",
+							"        pm.expect(book.ratings).to.have.property('count');\r",
+							"        pm.expect(book.ratings).to.have.property('rating_1');\r",
+							"        pm.expect(book.ratings).to.have.property('rating_2');\r",
+							"        pm.expect(book.ratings).to.have.property('rating_3');\r",
+							"        pm.expect(book.ratings).to.have.property('rating_4');\r",
+							"        pm.expect(book.ratings).to.have.property('rating_5');\r",
+							"        \r",
+							"        // Check icons object\r",
+							"        pm.expect(book).to.have.property('icons');\r",
+							"        pm.expect(book.icons).to.be.an('object');\r",
+							"        pm.expect(book.icons).to.have.property('large');\r",
+							"        pm.expect(book.icons).to.have.property('small');\r",
+							"    });\r",
+							"    \r",
+							"    // Validate the deleted books match the year range in the request\r",
+							"    const startYear = Number(pm.request.url.query.get(\"start_year\"));\r",
+							"    const endYear = Number(pm.request.url.query.get(\"end_year\"));\r",
+							"    \r",
+							"    pm.test(\"Deleted books match requested year range\", function () {\r",
+							"        const allBooksInRange = response.books.every(book => \r",
+							"            book.publication >= startYear && book.publication <= endYear\r",
+							"        );\r",
+							"        pm.expect(allBooksInRange).to.be.true;\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"// Set a variable with the number of deleted books for reporting\r",
+							"pm.environment.set(\"lastDeletedCount\", response.deletedCount);\r",
+							"\r",
+							"// Log results to the console for easy checking\r",
+							"console.log(`Deleted ${response.deletedCount} books in the specified year range.`);\r",
+							"if (response.books && response.books.length > 0) {\r",
+							"    console.log(\"Deleted books:\");\r",
+							"    response.books.forEach(book => {\r",
+							"        console.log(`- ${book.title} (${book.publication}) by ${book.authors}`);\r",
+							"    });\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiMSIsImlkIjo1LCJpYXQiOjE3NDYyMzEzNjYsImV4cCI6MTc0NzQ0MDk2Nn0.bOUKEXCAGPQIAAlz9fKdDZ7mefv1mdWfn7ImpENea-g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/c/delete_books_by_range?start_year=2019&end_year=2025",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"delete_books_by_range"
+					],
+					"query": [
+						{
+							"key": "start_year",
+							"value": "2019"
+						},
+						{
+							"key": "end_year",
+							"value": "2025"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Error 400: Invalid Parameters",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 400 for missing parameters\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message should match API documentation for missing parameters\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property('success', false);\r",
+							"    pm.expect(response).to.have.property('message');\r",
+							"    pm.expect(response.message).to.equal(\"Missing or invalid year parameters. Both start_year and end_year must be provided and valid.\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/c/delete_books_by_range",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"delete_books_by_range"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Error 400: Invalid Year Range",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 400 for non-numeric parameters\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message should match API documentation for invalid parameters\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property('success', false);\r",
+							"    pm.expect(response).to.have.property('message');\r",
+							"    pm.expect(response.message).to.equal(\"Invalid year range. start_year must be less than or equal to end_year.\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/delete_books_by_range?start_year=2025&end_year=2020",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"delete_books_by_range"
+					],
+					"query": [
+						{
+							"key": "start_year",
+							"value": "2025"
+						},
+						{
+							"key": "end_year",
+							"value": "2020"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Error 400: Negative Years (start)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 400 for negative years\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message should match API documentation for negative years\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property('success', false);\r",
+							"    pm.expect(response).to.have.property('message');\r",
+							"    pm.expect(response.message).to.equal(\"Invalid year values. Years cannot be negative.\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/delete_books_by_range?start_year=-5&end_year=2020",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"delete_books_by_range"
+					],
+					"query": [
+						{
+							"key": "start_year",
+							"value": "-5"
+						},
+						{
+							"key": "end_year",
+							"value": "2020"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Error 400: Negative Years (end)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 400 for negative years\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message should match API documentation for negative years\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property('success', false);\r",
+							"    pm.expect(response).to.have.property('message');\r",
+							"    pm.expect(response.message).to.equal(\"Invalid year values. Years cannot be negative.\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/delete_books_by_range?start_year=2019&end_year=-2024",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"delete_books_by_range"
+					],
+					"query": [
+						{
+							"key": "start_year",
+							"value": "2019"
+						},
+						{
+							"key": "end_year",
+							"value": "-2024"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Error 400: Future Years",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 400 for future years\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message should match API documentation for future years\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property('success', false);\r",
+							"    pm.expect(response).to.have.property('message');\r",
+							"    pm.expect(response.message).to.equal(\"Invalid year values. Years cannot be in the future.\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/delete_books_by_range?start_year=2017&end_year=2077",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"delete_books_by_range"
+					],
+					"query": [
+						{
+							"key": "start_year",
+							"value": "2017"
+						},
+						{
+							"key": "end_year",
+							"value": "2077"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Error 404: No Books Found (2020-2025)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 404 for no books found\", () => {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message should match API documentation for no books found\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property('success', false);\r",
+							"    pm.expect(response).to.have.property('message');\r",
+							"    pm.expect(response.message).to.equal(\"No books found in the specified year range.\");\r",
+							"});\r",
+							"\r",
+							"// Additional logging for debugging\r",
+							"console.log(\"Response status: \" + pm.response.code);\r",
+							"console.log(\"Response body: \" + JSON.stringify(pm.response.json(), null, 2));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/delete_books_by_range?start_year=2020&end_year=2025",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"delete_books_by_range"
+					],
+					"query": [
+						{
+							"key": "start_year",
+							"value": "2020"
+						},
+						{
+							"key": "end_year",
+							"value": "2025"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Error 404: No Books Found (1325-1337)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status should be 404 for no books found\", () => {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message should match API documentation for no books found\", () => {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property('success', false);\r",
+							"    pm.expect(response).to.have.property('message');\r",
+							"    pm.expect(response.message).to.equal(\"No books found in the specified year range.\");\r",
+							"});\r",
+							"\r",
+							"// Additional logging for debugging\r",
+							"console.log(\"Response status: \" + pm.response.code);\r",
+							"console.log(\"Response body: \" + JSON.stringify(pm.response.json(), null, 2));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/c/delete_books_by_range?start_year=1325&end_year=1337",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"c",
+						"delete_books_by_range"
+					],
+					"query": [
+						{
+							"key": "start_year",
+							"value": "1325"
+						},
+						{
+							"key": "end_year",
+							"value": "1337"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken\n}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
