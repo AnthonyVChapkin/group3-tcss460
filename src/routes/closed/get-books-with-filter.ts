@@ -1,5 +1,6 @@
 import express, { Request, Response, Router } from 'express';
 import { pool, validationFunctions } from '../../core/utilities';
+import { IBook, IRatings, IUrlIcon } from '../../core/models';
 
 const getBooksWithFilterRouter: Router = express.Router();
 
@@ -78,44 +79,39 @@ getBooksWithFilterRouter.get(
                     b.original_publication_year AS publication,
                     b.original_title,
                     b.title,
-                    JSON_BUILD_OBJECT(
-                    'average', ROUND(
+                    ROUND(
                     (br.ratings_1 * 1.0 + br.ratings_2 * 2.0 + br.ratings_3 * 3.0 + br.ratings_4 * 4.0 + br.ratings_5 * 5.0) /
                     NULLIF((br.ratings_1 + br.ratings_2 + br.ratings_3 + br.ratings_4 + br.ratings_5), 0), 2
-                    ),
-                    'count', (br.ratings_1 + br.ratings_2 + br.ratings_3 + br.ratings_4 + br.ratings_5),
-                    'rating_1', br.ratings_1,
-                    'rating_2', br.ratings_2,
-                    'rating_3', br.ratings_3,
-                    'rating_4', br.ratings_4,
-                    'rating_5', br.ratings_5
-                    ) AS ratings,
-                    JSON_BUILD_OBJECT(
-                    'large', b.image_url,
-                    'small', b.small_image_url
-                    ) AS icons
+                    ) AS average,
+                    (br.ratings_1 + br.ratings_2 + br.ratings_3 + br.ratings_4 + br.ratings_5
+                    ) AS count,
+                    br.ratings_1 AS rating_1,
+                    br.ratings_2 AS rating_2,
+                    br.ratings_3 AS rating_3,
+                    br.ratings_4 AS rating_4,
+                    br.ratings_5 AS rating_5,
+                    b.image_url AS large,
+                    b.small_image_url AS small
                     FROM 
                     books b 
                     JOIN author_books ab ON b.isbn13 = ab.isbn13
                     JOIN authors a ON a.author_id = ab.author_id
                     JOIN book_ratings br ON br.isbn13 = ab.isbn13
-					WHERE b.isbn13 IN (
+                    WHERE b.isbn13 IN (
                     SELECT b2.isbn13
                     FROM books b2
                     JOIN author_books ab2 ON b2.isbn13 = ab2.isbn13
                     JOIN authors a2 ON a2.author_id = ab2.author_id
                     WHERE a2.author ILIKE '%' || $1 || '%'
                     )
-					AND b.title ILIKE '%' || $2 || '%'
-					AND b.original_publication_year BETWEEN $3 AND $4
-					AND
-					ROUND(
+                    AND b.title ILIKE '%' || $2 || '%'
+                    AND b.original_publication_year BETWEEN $3 AND $4
+                    AND ROUND(
                     (br.ratings_1 * 1.0 + br.ratings_2 * 2.0 + br.ratings_3 * 3.0 + br.ratings_4 * 4.0 + br.ratings_5 * 5.0) /
                     NULLIF((br.ratings_1 + br.ratings_2 + br.ratings_3 + br.ratings_4 + br.ratings_5), 0), 2
                     ) BETWEEN $5 AND $6
-					AND
-					(br.ratings_1 + br.ratings_2 + br.ratings_3 + br.ratings_4 + br.ratings_5)
-					BETWEEN $7 AND $8::numeric
+                    AND (br.ratings_1 + br.ratings_2 + br.ratings_3 + br.ratings_4 + br.ratings_5)
+                    BETWEEN $7 AND $8::numeric
                     GROUP BY 
                     b.isbn13,
                     b.original_publication_year,
@@ -128,12 +124,9 @@ getBooksWithFilterRouter.get(
                     br.ratings_5,
                     b.image_url,
                     b.small_image_url
-                    ORDER BY 
-                    b.isbn13
-                    LIMIT 
-                    $9
-                    OFFSET 
-                    $10;
+                    ORDER BY b.isbn13
+                    LIMIT $9
+                    OFFSET $10;
                     `;
 
         try {
@@ -184,6 +177,30 @@ getBooksWithFilterRouter.get(
                 count = result.rows[0].exact_count;
             }
 
+            // Format rows into IBooks.
+            const books: IBook[] = rows.map((row) => {
+                return {
+                    isbn13: row.isbn13,
+                    authors: row.authors,
+                    publication: row.publication,
+                    original_title: row.original_title,
+                    title: row.title,
+                    ratings: {
+                        average: row.average,
+                        count: row.count,
+                        rating_1: row.rating_1,
+                        rating_2: row.rating_2,
+                        rating_3: row.rating_3,
+                        rating_4: row.rating_4,
+                        rating_5: row.rating_5,
+                    } as IRatings,
+                    icons: {
+                        large: row.large,
+                        small: row.small,
+                    } as IUrlIcon,
+                } as IBook;
+            });
+
             response.status(200).send({
                 pagination: {
                     totalRecords: count,
@@ -192,7 +209,7 @@ getBooksWithFilterRouter.get(
                     nextPage: limit + offset,
                     hasMore: getTotal ? offset + limit < count : null,
                 },
-                books: rows,
+                books: books,
             });
         } catch (error) {
             console.error('Database error on get books with filter');
