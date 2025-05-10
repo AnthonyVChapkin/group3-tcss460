@@ -50,6 +50,7 @@ const isNumberProvided = validationFunctions.isNumberProvided;
  * @apiError (400: Missing Parameters) {String} message "Missing required information - please refer to documentation"
  * @apiError (400: Invalid Year) {String} message "Invalid or missing publication year - please refer to documentation"
  * @apiError (400: JSON Error) {String} message "malformed JSON in parameters"
+ * @apiError (500: Server Error) {String} message "server error - contact support"
  */
 bookRouter.post(
     '/',

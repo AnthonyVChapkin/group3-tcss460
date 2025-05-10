@@ -9,6 +9,7 @@ import { updateBookRatingsRouter } from './update_book_ratings';
 import { updatePasswordRouter } from './update_password';
 import { bookRouter } from './book';
 import { getBooksByOffsetRouter } from './get-books-by-offset';
+import { deleteBooksByRangeRouter } from './delete_books_by_range';
 
 const closedRoutes: Router = express.Router();
 
@@ -21,5 +22,6 @@ closedRoutes.use('/c/update_book_ratings',checkToken, updateBookRatingsRouter )
 closedRoutes.use('/c/update_password', checkToken, updatePasswordRouter);
 closedRoutes.use('/c/book', checkToken, bookRouter);
 closedRoutes.use('/c/books/offset', checkToken, getBooksByOffsetRouter);
+closedRoutes.use('/c/delete_books_by_range', checkToken, deleteBooksByRangeRouter);
 
 export { closedRoutes };
