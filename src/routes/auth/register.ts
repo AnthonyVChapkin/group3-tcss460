@@ -46,35 +46,43 @@ const emailMiddlewareCheck = (
 /**
  * @api {post} /register Request to register a user
  *
- * @apiDescription Registers a new user. Password must be at least 12 characters long, include at least one uppercase letter, one lowercase letter, one digit, and one special character. Role must be a number between 1 and 5.
+ * @apiDescription Registers a new user.
+ * Password rules:
+ * - At least 12 characters
+ * - 1 uppercase letter
+ * - 1 lowercase letter
+ * - 1 digit
+ * - 1 special character (!@#$%^&*(),.?":{}|<>)
+ * Role must be a number between 1-5
  *
  * @apiName PostRegister
  * @apiGroup Auth
  *
- * @apiBody {String} firstname a users first name
- * @apiBody {String} lastname a users last name
- * @apiBody {String} email a users email *unique
- * @apiBody {String} password a users password
- * @apiBody {String} username a username *unique
- * @apiBody {Number} role a role for this user (1-5)
- * @apiBody {String} phone a phone number for this user
+ * @apiBody {String} firstname User's first name
+ * @apiBody {String} lastname User's last name
+ * @apiBody {String} email User's email (must be unique)
+ * @apiBody {String} password User's password
+ * @apiBody {String} username Username (must be unique)
+ * @apiBody {Number} role User role (1-5)
+ * @apiBody {String} phone Phone number (10-15 digits)
  *
  * @apiSuccess {String} accessToken JSON Web Token
- * @apiSuccess {Object} user a user object
- * @apiSuccess {string} user.name the first name associated with <code>email</code>
- * @apiSuccess {string} user.email The email associated with <code>email</code>
- * @apiSuccess {string} user.role The role associated with <code>email</code>
- * @apiSuccess {number} user.id The internal user id associated with <code>email</code>
+ * @apiSuccess {Object} user User object
+ * @apiSuccess {Number} user.id Internal user ID
+ * @apiSuccess {String} user.name First name
+ * @apiSuccess {String} user.email User email
+ * @apiSuccess {Number} user.role User role
  *
  * @apiError (400: Missing Parameters) {String} message "Missing required information"
- * @apiError (400: Invalid Password) {String} message "Invalid or missing password  - please refer to documentation"
- * @apiError (400: Invalid Phone) {String} message "Invalid or missing phone number  - please refer to documentation"
- * @apiError (400: Invalid Email) {String} message "Invalid or missing email  - please refer to documentation"
- * @apiError (400: Invalid Role) {String} message "Invalid or missing role  - please refer to documentation"
- * @apiError (400: Username exists) {String} message "Username exists"
- * @apiError (400: Email exists) {String} message "Email exists"
- * @apiError (400: Phone number exists) {String} message "Phone number exists"
- *
+ * @apiError (400: Invalid Password) {String} message "Invalid password"
+ * @apiError (400: Invalid Password) {String[]} Errors Array of password validation errors
+ * @apiError (400: Invalid Phone) {String} message "Invalid phone number"
+ * @apiError (400: Invalid Phone) {String[]} Errors Array of phone validation errors
+ * @apiError (400: Invalid Email) {String} message "Invalid email"
+ * @apiError (400: Invalid Email) {String[]} Errors Array of email validation errors
+ * @apiError (400: Invalid Role) {String} message "Invalid or missing role"
+ * @apiError (400: Username Exists) {String} message "Username exists"
+ * @apiError (400: Email Exists) {String} message "Email exists"
  */
 registerRouter.post(
     '/register',

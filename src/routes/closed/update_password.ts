@@ -11,15 +11,18 @@ const updatePasswordRouter: Router = express.Router();
 const isStringProvided = validationFunctions.isStringProvided;
 const generateHash = credentialingFunctions.generateHash;
 const generateSalt = credentialingFunctions.generateSalt;
-
-// Add password validation - same as in register.ts
-const isValidPassword = (password: string): boolean =>
-    isStringProvided(password) && password.length > 7;
+const validatePassword = validationFunctions.validatePassword;
 
 /**
  * @api {patch} /c/update_password Request to update user password
  *
- * @apiDescription Request to update a user's password after validating their current password
+ * @apiDescription Updates user password after verification.
+ * New password requirements:
+ * - At least 12 characters
+ * - 1 uppercase letter
+ * - 1 lowercase letter
+ * - 1 digit
+ * - 1 special character (!@#$%^&*(),.?":{}|<>)
  *
  * @apiName UpdatePassword
  * @apiGroup Auth
@@ -27,18 +30,20 @@ const isValidPassword = (password: string): boolean =>
  * @apiUse JWT
  *
  * @apiBody {String} acc_info User's email or username
- * @apiBody {String} oldpass User's current password
- * @apiBody {String} newpass User's new password
- * @apiBody {String} newpass_retype Retype of the new password for confirmation
+ * @apiBody {String} oldpass Current password
+ * @apiBody {String} newpass New password
+ * @apiBody {String} newpass_retype New password confirmation
  *
- * @apiSuccess (Success 200) {Object} message Success message indicating password was updated
+ * @apiSuccess (Success 200) {Object} message "Password updated successfully"
  *
  * @apiError (400: Missing Parameters) {String} message "Missing required information"
- * @apiError (400: Invalid Credentials) {String} message "Invalid credentials - (Wrong old password)"
- * @apiError (400: Invalid New Password) {String} message "Invalid or missing password - (Password must be at least 8 characters long)"
  * @apiError (400: Password Mismatch) {String} message "New password and retyped password don't match"
  * @apiError (400: Same Password) {String} message "New password must be different from current password"
- * @apiError (404: Account Not Found) {String} message "Account not found"
+ * @apiError (400: Invalid New Password) {String} message "Invalid new password - please refer to documentation"
+ * @apiError (400: Invalid New Password) {String[]} Errors Array of password validation errors
+ * @apiError (400: Invalid Credentials) {String} message "Invalid credentials - please refer to documentation"
+ * @apiError (403: Forbidden) {String} message "Credentials do not match for this user"
+ * @apiError (404: Not Found) {String} message "Account not found"
  */
 updatePasswordRouter.patch(
     '/',
@@ -63,8 +68,7 @@ updatePasswordRouter.patch(
             next();
         } else {
             response.status(400).send({
-                message:
-                    "New password credentialsand retyped password don't match",
+                message: "New password and retyped password don't match",
             });
         }
     },
@@ -80,11 +84,13 @@ updatePasswordRouter.patch(
     },
     (request: IJwtRequest, response: Response, next: NextFunction) => {
         // Validate new password requirements
-        if (isValidPassword(request.body.newpass)) {
+        const passwordErrors = validatePassword(request.body.newpas);
+        if (passwordErrors.length === 0) {
             next();
         } else {
             response.status(400).send({
                 message: 'Invalid new password - please refer to documentation',
+                Errors: passwordErrors,
             });
         }
     },
