@@ -1,6 +1,5 @@
 // express is the framework we're going to use to handle requests
 import express, { Request, Response, Router, NextFunction } from 'express';
-
 import jwt from 'jsonwebtoken';
 
 const key = {
@@ -17,6 +16,9 @@ const isStringProvided = validationFunctions.isStringProvided;
 const isNumberProvided = validationFunctions.isNumberProvided;
 const generateHash = credentialingFunctions.generateHash;
 const generateSalt = credentialingFunctions.generateSalt;
+const validatePassword = validationFunctions.validatePassword;
+const validatePhoneNumber = validationFunctions.validatePhoneNumber;
+const validateEmail = validationFunctions.validateEmail;
 
 const registerRouter: Router = express.Router();
 
@@ -24,48 +26,27 @@ export interface IUserRequest extends Request {
     id: number;
 }
 
-// Add more/your own password validation here. The *rules* must be documented
-// and the client-side validation should match these rules.
-const isValidPassword = (password: string): boolean =>
-    isStringProvided(password) && password.length > 7;
-
-// Add more/your own phone number validation here. The *rules* must be documented
-// and the client-side validation should match these rules.
-const isValidPhone = (phone: string): boolean =>
-    isStringProvided(phone) && phone.length >= 10;
-
-// Add more/your own role validation here. The *rules* must be documented
-// and the client-side validation should match these rules.
-const isValidRole = (priority: string): boolean =>
-    validationFunctions.isNumberProvided(priority) &&
-    parseInt(priority) >= 1 &&
-    parseInt(priority) <= 5;
-
-// Add more/your own email validation here. The *rules* must be documented
-// and the client-side validation should match these rules.
-const isValidEmail = (email: string): boolean =>
-    isStringProvided(email) && email.includes('@');
-
-// middleware functions may be defined elsewhere!
+// Middleware for email validation
 const emailMiddlewareCheck = (
     request: Request,
     response: Response,
     next: NextFunction
 ) => {
-    if (isValidEmail(request.body.email)) {
+    const emailErrors = validateEmail(request.body.email);
+
+    if (emailErrors.length === 0) {
         next();
     } else {
-        response.status(400).send({
-            message: 'Invalid or missing email - please refer to documentation',
-        });
+        response
+            .status(400)
+            .send({ message: 'Invalid email', Errors: emailErrors });
     }
 };
 
 /**
  * @api {post} /register Request to register a user
  *
- * @apiDescription Document this route. !**Document the password rules here**!
- * !**Document the role rules here**!
+ * @apiDescription Registers a new user. Password must be at least 12 characters long, include at least one uppercase letter, one lowercase letter, one digit, and one special character. Role must be a number between 1 and 5.
  *
  * @apiName PostRegister
  * @apiGroup Auth
@@ -75,7 +56,7 @@ const emailMiddlewareCheck = (
  * @apiBody {String} email a users email *unique
  * @apiBody {String} password a users password
  * @apiBody {String} username a username *unique
- * @apiBody {String} role a role for this user [1-5]
+ * @apiBody {Number} role a role for this user (1-5)
  * @apiBody {String} phone a phone number for this user
  *
  * @apiSuccess {String} accessToken JSON Web Token
@@ -96,44 +77,48 @@ const emailMiddlewareCheck = (
  */
 registerRouter.post(
     '/register',
-    emailMiddlewareCheck, // these middleware functions may be defined elsewhere!
+    emailMiddlewareCheck,
     (request: Request, response: Response, next: NextFunction) => {
-        //Verify that the caller supplied all the parameters
-        //In js, empty strings or null values evaluate to false
+        const phoneErrors = validatePhoneNumber(request.body.phone);
+
+        if (phoneErrors.length === 0) {
+            next();
+        } else {
+            response
+                .status(400)
+                .send({ message: 'Invalid phone number', Errors: phoneErrors });
+        }
+    },
+    (request: Request, response: Response, next: NextFunction) => {
+        const passwordErrors = validatePassword(request.body.password);
+
+        if (passwordErrors.length === 0) {
+            next();
+        } else {
+            response
+                .status(400)
+                .send({ message: 'Invalid password', Errors: passwordErrors });
+        }
+    },
+    (request: Request, response: Response, next: NextFunction) => {
+        const { firstname, lastname, username, role } = request.body;
+
         if (
-            isStringProvided(request.body.firstname) &&
-            isStringProvided(request.body.lastname) &&
-            isStringProvided(request.body.username)
+            isStringProvided(firstname) &&
+            isStringProvided(lastname) &&
+            isStringProvided(username) &&
+            isNumberProvided(role)
         ) {
             next();
         } else {
-            response.status(400).send({
-                message: 'Missing required information',
-            });
+            response
+                .status(400)
+                .send({ message: 'Missing required information' });
         }
     },
     (request: Request, response: Response, next: NextFunction) => {
-        if (isValidPhone(request.body.phone)) {
-            next();
-        } else {
-            response.status(400).send({
-                message:
-                    'Invalid or missing phone number  - please refer to documentation',
-            });
-        }
-    },
-    (request: Request, response: Response, next: NextFunction) => {
-        if (isValidPassword(request.body.password)) {
-            next();
-        } else {
-            response.status(400).send({
-                message:
-                    'Invalid or missing password  - please refer to documentation',
-            });
-        }
-    },
-    (request: Request, response: Response, next: NextFunction) => {
-        if (isValidRole(request.body.role)) {
+        const role = Number(request.body.role);
+        if (role >= 1 && role <= 5) {
             next();
         } else {
             response.status(400).send({
@@ -142,115 +127,63 @@ registerRouter.post(
             });
         }
     },
-    (request: IUserRequest, response: Response, next: NextFunction) => {
-        const theQuery =
-            'INSERT INTO Account(firstname, lastname, username, email, phone, account_role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING account_id';
-        const values = [
-            request.body.firstname,
-            request.body.lastname,
-            request.body.username,
-            request.body.email,
-            request.body.phone,
-            request.body.role,
-        ];
-        // console.dir({ ...request.body, password: '******' });
-        pool.query(theQuery, values)
-            .then((result) => {
-                //stash the account_id into the request object to be used in the next function
-                // NOTE the TYPE for the Request object in this middleware function
-                request.id = result.rows[0].account_id;
-                next();
-            })
-            .catch((error) => {
-                //log the error
-                // console.log(error)
-                if (error.constraint == 'account_username_key') {
-                    response.status(400).send({
-                        message: 'Username exists',
-                    });
-                } else if (error.constraint == 'account_email_key') {
-                    response.status(400).send({
-                        message: 'Email exists',
-                    });
-                } else if (error.constraint == 'account_phone_key') {
-                    response.status(400).send({
-                        message: 'Duplicate phone number not allowed',
-                    });
-                } else {
-                    //log the error
-                    console.error('DB Query error on register');
-                    console.error(error);
-                    response.status(500).send({
-                        message: 'server error - contact support',
-                    });
-                }
+    async (request: IUserRequest, response: Response) => {
+        try {
+            const {
+                firstname,
+                lastname,
+                username,
+                email,
+                phone,
+                role,
+                password,
+            } = request.body;
+
+            const salt = generateSalt(32);
+            const saltedHash = generateHash(password, salt);
+
+            const query =
+                'INSERT INTO Account(firstname, lastname, username, email, phone, account_role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING account_id';
+            const values = [
+                firstname,
+                lastname,
+                username,
+                email,
+                phone,
+                Number(role),
+            ];
+
+            const result = await pool.query(query, values);
+            const userId = result.rows[0].account_id;
+
+            await pool.query(
+                'INSERT INTO Account_Credential(account_id, salted_hash, salt) VALUES ($1, $2, $3)',
+                [userId, saltedHash, salt]
+            );
+
+            const accessToken = jwt.sign({ role, id: userId }, key.secret, {
+                expiresIn: '14 days',
             });
-    },
-    (request: IUserRequest, response: Response) => {
-        //We're storing salted hashes to make our application more secure
-        //If you're interested as to what that is, and why we should use it
-        //watch this youtube video: https://www.youtube.com/watch?v=8ZtInClXe1Q
-        const salt = generateSalt(32);
-        const saltedHash = generateHash(request.body.password, salt);
 
-        const theQuery =
-            'INSERT INTO Account_Credential(account_id, salted_hash, salt) VALUES ($1, $2, $3)';
-        const values = [request.id, saltedHash, salt];
-        pool.query(theQuery, values)
-            .then(() => {
-                const accessToken = jwt.sign(
-                    {
-                        role: request.body.role,
-                        id: request.id,
-                    },
-                    key.secret,
-                    {
-                        expiresIn: '14 days', // expires in 14 days
-                    }
-                );
-                console.dir({ ...request.body, password: '******' });
-                //We successfully added the user!
-                response.status(201).send({
-                    accessToken,
-
-                    user: {
-                        id: request.id,
-                        name: request.body.firstname,
-                        email: request.body.email,
-                        role: 'Admin',
-                    },
-                });
-            })
-            .catch((error) => {
-                /***********************************************************************
-                 * If we get an error inserting the PWD, we should go back and remove
-                 * the user from the member table. We don't want a member in that table
-                 * without a PWD! That implementation is up to you if you want to add
-                 * that step.
-                 **********************************************************************/
-
-                //log the error
-                console.error('DB Query error on register');
+            response.status(201).send({
+                accessToken,
+                user: { id: userId, name: firstname, email, role },
+            });
+        } catch (error) {
+            if (error.code === '23505') {
+                // Unique constraint violation
+                const message = error.detail.includes('email')
+                    ? 'Email exists'
+                    : 'Username exists';
+                response.status(400).send({ message });
+            } else {
                 console.error(error);
-                response.status(500).send({
-                    message: 'server error - contact support',
-                });
-            });
+                response
+                    .status(500)
+                    .send({ message: 'Server error - contact support' });
+            }
+        }
     }
 );
-
-registerRouter.get('/hash_demo', (request, response) => {
-    const password = 'password12345';
-
-    const salt = generateSalt(32);
-    const saltedHash = generateHash(password, salt);
-    const unsaltedHash = generateHash(password, '');
-
-    response.status(200).send({
-        salt: salt,
-        salted_hash: saltedHash,
-        unsalted_hash: unsaltedHash,
-    });
-});
 
 export { registerRouter };
