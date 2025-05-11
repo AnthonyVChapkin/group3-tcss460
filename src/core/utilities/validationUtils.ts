@@ -99,7 +99,7 @@ function validatePassword(password: string): string[] {
  */
 function validateEmail(email: string): string[] {
     const errors: string[] = [];
-    const emailRegex = /^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i;
 
     // Looks something like example@example.com
     if (!emailRegex.test(email)) {

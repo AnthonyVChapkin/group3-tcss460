@@ -73,6 +73,7 @@ const emailMiddlewareCheck = (
  * @apiError (400: Invalid Role) {String} message "Invalid or missing role  - please refer to documentation"
  * @apiError (400: Username exists) {String} message "Username exists"
  * @apiError (400: Email exists) {String} message "Email exists"
+ * @apiError (400: Phone number exists) {String} message "Phone number exists"
  *
  */
 registerRouter.post(
@@ -172,9 +173,18 @@ registerRouter.post(
         } catch (error) {
             if (error.code === '23505') {
                 // Unique constraint violation
-                const message = error.detail.includes('email')
-                    ? 'Email exists'
-                    : 'Username exists';
+                console.error(error);
+                const detail = error.detail || '';
+                let message = 'Unique constraint violation';
+
+                if (detail.includes('email')) {
+                    message = 'Email exists';
+                } else if (detail.includes('username')) {
+                    message = 'Username exists';
+                } else if (detail.includes('phone')) {
+                    message = 'Phone number exists';
+                }
+
                 response.status(400).send({ message });
             } else {
                 console.error(error);
