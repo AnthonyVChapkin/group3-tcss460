@@ -91,6 +91,42 @@ function validatePassword(password: string): string[] {
     return errors;
 }
 
+/**
+ * Validates an email address.
+ *
+ * @param {string} email - The email string to validate.
+ * @returns {string[]} An array of error messages, if any validation rules are violated.
+ */
+function validateEmail(email: string): string[] {
+    const errors: string[] = [];
+    const emailRegex = /^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
+
+    // Looks something like example@example.com
+    if (!emailRegex.test(email)) {
+        errors.push('Invalid email format.');
+    }
+
+    return errors;
+}
+
+/**
+ * Validates a phone number.
+ *
+ * @param {string} phone  The phone number string to validate.
+ * @returns {string[]} An array of error messages, if any validation rules are violated.
+ */
+function validatePhoneNumber(phone: string): string[] {
+    const errors: string[] = [];
+    const phoneRegex = /^[0-9]{10,15}$/;
+
+    // Is the right lengh and contains only numbers.
+    if (!phoneRegex.test(phone)) {
+        errors.push('Invalid phone number format. Only digits are allowed.');
+    }
+
+    return errors;
+}
+
 // Feel free to add your own validations functions!
 // for example: isNumericProvided, isValidPassword, isValidEmail, etc
 // don't forget to export any
@@ -99,6 +135,8 @@ const validationFunctions = {
     isStringProvided,
     isNumberProvided,
     validatePassword,
+    validateEmail,
+    validatePhoneNumber,
 };
 
 export { validationFunctions };
