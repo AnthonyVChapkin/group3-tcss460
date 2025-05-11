@@ -84,7 +84,7 @@ updatePasswordRouter.patch(
     },
     (request: IJwtRequest, response: Response, next: NextFunction) => {
         // Validate new password requirements
-        const passwordErrors = validatePassword(request.body.newpas);
+        const passwordErrors = validatePassword(request.body.newpass);
         if (passwordErrors.length === 0) {
             next();
         } else {
