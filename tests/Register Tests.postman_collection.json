@@ -1,0 +1,386 @@
+{
+	"info": {
+		"_postman_id": "0132cad6-8e37-4683-bfe4-49509a9561c2",
+		"name": "Register Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29221157"
+	},
+	"item": [
+		{
+			"name": "Successful Registration Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 201 - Registration Success\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Has JWT and User Data\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.accessToken).to.be.a('string');\r",
+							"    pm.expect(jsonData.user).to.have.keys(['id', 'name', 'email', 'role']);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstname\": \"Doe\",\r\n    \"lastname\": \"John\",\r\n    \"email\": \"john1@example.com\",\r\n    \"password\": \"SecurePass123!\",\r\n    \"username\": \"doejohn\",\r\n    \"role\": 2,\r\n    \"phone\": \"1234567890\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Missing Required Fields Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 400 - Missing Info\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"    pm.expect(pm.response.json().message).to.eql(\"Missing required information\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstname\": \"John\",\r\n    \"email\": \"john@example.com\",\r\n    \"password\": \"ValidPass123!\",\r\n    \"phone\": \"1234567890\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid Email Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 400 - Invalid Email\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"    pm.expect(pm.response.json().message).to.eql(\"Invalid email\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstname\": \"John\",\r\n    \"lastname\": \"Doe\",\r\n    \"email\": \"invalid-email\",\r\n    \"password\": \"ValidPass123!\",\r\n    \"username\": \"johndoe\",\r\n    \"role\": 2,\r\n    \"phone\": \"1234567890\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid Phone Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 400 - Invalid Phone\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"    pm.expect(pm.response.json().message).to.eql(\"Invalid phone number\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstname\": \"John\",\r\n    \"lastname\": \"Doe\",\r\n    \"email\": \"john@example.com\",\r\n    \"password\": \"ValidPass123!\",\r\n    \"username\": \"johndoe\",\r\n    \"role\": 2,\r\n    \"phone\": \"invalid-phone\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid Password Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 400 - Invalid Password\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"    pm.expect(pm.response.json().message).to.eql(\"Invalid password\");\r",
+							"    pm.expect(pm.response.json().Errors).to.include(\"Password must be at least 12 characters long.\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstname\": \"John\",\r\n    \"lastname\": \"Doe\",\r\n    \"email\": \"john@example.com\",\r\n    \"password\": \"weak\",\r\n    \"username\": \"johndoe\",\r\n    \"role\": 2,\r\n    \"phone\": \"1234567890\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid Role Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 400 - Invalid Role\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"    pm.expect(pm.response.json().message).to.eql(\"Invalid or missing role  - please refer to documentation\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstname\": \"John\",\r\n    \"lastname\": \"Doe\",\r\n    \"email\": \"john@example.com\",\r\n    \"password\": \"ValidPass123!\",\r\n    \"username\": \"johndoe\",\r\n    \"role\": 6,\r\n    \"phone\": \"1234567890\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Duplicate Username Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Try running a second time if fails.\r",
+							"pm.test(\"Status 400 - Duplicate Username\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"    pm.expect(pm.response.json().message).to.eql(\"Username exists\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstname\": \"Jane\",\r\n    \"lastname\": \"Doe\",\r\n    \"email\": \"jane@example.com\",\r\n    \"password\": \"AnotherValid123!\",\r\n    \"username\": \"johndoe\",\r\n    \"role\": 3,\r\n    \"phone\": \"0987654321\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Duplicate Phone Number Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 400 - Duplicate Email\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"    pm.expect(pm.response.json().message).to.eql(\"Phone number exists\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstname\": \"The Great\",\r\n    \"lastname\": \"Oz\",\r\n    \"email\": \"john@example.com\",\r\n    \"password\": \"AnotherValid123!\",\r\n    \"username\": \"The Great Oz\",\r\n    \"role\": 3,\r\n    \"phone\": \"0987654321\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Duplicate Email Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 400 - Duplicate Email\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"    pm.expect(pm.response.json().message).to.eql(\"Email exists\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstname\": \"Jane\",\r\n    \"lastname\": \"Doe\",\r\n    \"email\": \"john@example.com\",\r\n    \"password\": \"AnotherValid123!\",\r\n    \"username\": \"doejane\",\r\n    \"role\": 3,\r\n    \"phone\": \"0987654421\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
