@@ -11,6 +11,7 @@ import { bookRouter } from './book';
 import { getBooksByOffsetRouter } from './get-books-by-offset';
 import { getBooksWithFilterRouter } from './get-books-with-filter';
 import { deleteBooksByRangeRouter } from './delete_books_by_range';
+import { deleteBookByISBNRouter } from './delete_book_by_isbn'
 
 const closedRoutes: Router = express.Router();
 
@@ -25,5 +26,7 @@ closedRoutes.use('/c/book', checkToken, bookRouter);
 closedRoutes.use('/c/books/offset', checkToken, getBooksByOffsetRouter);
 closedRoutes.use('/c/books/filter', checkToken, getBooksWithFilterRouter);
 closedRoutes.use('/c/delete_books_by_range', checkToken, deleteBooksByRangeRouter);
+closedRoutes.use('/c/delete_books_by_ISBN', checkToken, deleteBookByISBNRouter);
+
 
 export { closedRoutes };
