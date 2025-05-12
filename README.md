@@ -69,4 +69,23 @@ During the Beta II Sprint, the primary forms of communication were:
 
 - **Discord**: For messaging and calling.
 
-## Beta Sprint Comments
+## Beta II Sprint Comments
+
+## Production Version Contribution
+
+### Group Members:
+
+- **Anthony Chapkin**: Implemented get books by filter route, and updated password validation.
+- **Peter Madin**: Implemented route to delete a series of books by year, and updated routes to use IBook.
+- **Riley Mansfield**: Implemented route to get books by rating.
+- **Zakariye Luqman**: Implemented route to delete a book by isbn, and get books by title.
+
+## Production Version Sprint Meetings
+
+- Met on a discord call to discuss how to split up work. 5/8/2025.
+
+During the Production Version Sprint, the primary forms of communication were:
+
+- **Discord**: For messaging and calling.
+
+## Production Version Sprint Comments
