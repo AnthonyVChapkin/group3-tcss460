@@ -12,11 +12,12 @@ import { getBooksByOffsetRouter } from './get-books-by-offset';
 import { getBooksWithFilterRouter } from './get-books-with-filter';
 import { deleteBooksByRangeRouter } from './delete_books_by_range';
 import { deleteBookByISBNRouter } from './delete_book_by_isbn'
+import { getBooksByRatingRouter } from './get_books_by_rating';
 
 const closedRoutes: Router = express.Router();
 
 closedRoutes.use('/jwt_test', checkToken, tokenTestRouter);
-
+closedRoutes.use('/c/get_books_by_rating', checkToken, getBooksByRatingRouter);
 closedRoutes.use('/c/message', checkToken, messageRouter);
 closedRoutes.use('/c/get_book_by_ISBN', checkToken, getBookByISBNRouter);
 closedRoutes.use('/c/get_book_by_author', checkToken, getBookByAuthorRouter);
