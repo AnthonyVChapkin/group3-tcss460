@@ -11,10 +11,9 @@ import { bookRouter } from './book';
 import { getBooksByOffsetRouter } from './get-books-by-offset';
 import { getBooksWithFilterRouter } from './get-books-with-filter';
 import { deleteBooksByRangeRouter } from './delete_books_by_range';
-import { deleteBookByISBNRouter } from './delete_book_by_isbn'
+import { deleteBookByISBNRouter } from './delete_book_by_isbn';
 import { getBooksByRatingRouter } from './get_books_by_rating';
 import { getBookByTitleRouter } from './get_book_by_title';
-
 
 const closedRoutes: Router = express.Router();
 
@@ -28,10 +27,12 @@ closedRoutes.use('/c/update_password', checkToken, updatePasswordRouter);
 closedRoutes.use('/c/book', checkToken, bookRouter);
 closedRoutes.use('/c/books/offset', checkToken, getBooksByOffsetRouter);
 closedRoutes.use('/c/books/filter', checkToken, getBooksWithFilterRouter);
-closedRoutes.use('/c/delete_books_by_range', checkToken, deleteBooksByRangeRouter);
-closedRoutes.use('/c/delete_books_by_ISBN', checkToken, deleteBookByISBNRouter);
+closedRoutes.use(
+    '/c/delete_books_by_range',
+    checkToken,
+    deleteBooksByRangeRouter
+);
+closedRoutes.use('/c/delete_book_by_ISBN', checkToken, deleteBookByISBNRouter);
 closedRoutes.use('/c/get_book_by_title', checkToken, getBookByTitleRouter);
-
-
 
 export { closedRoutes };
